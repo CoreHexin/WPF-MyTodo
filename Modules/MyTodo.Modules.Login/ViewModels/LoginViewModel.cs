@@ -1,7 +1,7 @@
-﻿using Prism.Commands;
+﻿using System;
+using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
-using System;
 
 namespace MyTodo.Modules.Login.ViewModels
 {
@@ -16,6 +16,8 @@ namespace MyTodo.Modules.Login.ViewModels
             set { SetProperty(ref _selectedIndex, value); }
         }
 
+        public string Password { private get; set; }
+
         public event Action<IDialogResult> RequestClose;
 
         private DelegateCommand _loginCommand;
@@ -26,17 +28,6 @@ namespace MyTodo.Modules.Login.ViewModels
         private DelegateCommand _switchCommand;
         public DelegateCommand SwitchCommand =>
             _switchCommand ?? (_switchCommand = new DelegateCommand(ExecuteSwitchCommand));
-
-        private void ExecuteSwitchCommand()
-        {
-            SelectedIndex = SelectedIndex == 0 ? 1 : 0;
-        }
-
-
-        private void ExecuteCommandName()
-        {
-
-        }
 
         public LoginViewModel() { }
 
@@ -49,10 +40,14 @@ namespace MyTodo.Modules.Login.ViewModels
 
         public void OnDialogOpened(IDialogParameters parameters) { }
 
+        private void ExecuteSwitchCommand()
+        {
+            SelectedIndex = SelectedIndex == 0 ? 1 : 0;
+        }
+
         void ExecuteLoginCommand()
         {
             RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
         }
-
     }
 }
