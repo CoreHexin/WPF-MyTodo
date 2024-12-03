@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyTodo.WebServer.Data;
 using MyTodo.WebServer.DTOs;
@@ -11,10 +12,12 @@ namespace MyTodo.WebServer.Controllers
     public class AccountController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public AccountController(AppDbContext appDbContext)
+        public AccountController(AppDbContext appDbContext, IMapper mapper)
         {
             _dbContext = appDbContext;
+            _mapper = mapper;
         }
 
         [HttpPost("login")]
@@ -30,7 +33,7 @@ namespace MyTodo.WebServer.Controllers
                 return NotFound();
             }
 
-            var newUserDTO = new NewUserDTO { Email = user.Email, Name = user.Name };
+            var newUserDTO = _mapper.Map<NewUserDTO>(user);
             return Ok(newUserDTO);
         }
 
@@ -61,7 +64,7 @@ namespace MyTodo.WebServer.Controllers
             _dbContext.Users.Add(newUser);
             await _dbContext.SaveChangesAsync();
 
-            var newUserDTO = new NewUserDTO { Email = registerDTO.Email, Name = registerDTO.Name };
+            var newUserDTO = _mapper.Map<NewUserDTO>(registerDTO);
             return Ok(newUserDTO);
         }
     }

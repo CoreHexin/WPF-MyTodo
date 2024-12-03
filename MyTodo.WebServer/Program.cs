@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MyTodo.WebServer;
 using MyTodo.WebServer.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddAutoMapper(typeof(AutoMapperSettings));
 
 var app = builder.Build();
 
