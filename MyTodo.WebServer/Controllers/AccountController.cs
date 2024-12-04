@@ -23,6 +23,8 @@ namespace MyTodo.WebServer.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDTO loginDTO)
         {
+            var response = new ApiResponse();
+
             var user = await _dbContext
                 .Users.Where(u => u.Email == loginDTO.Email)
                 .Where(u => u.Password == loginDTO.Password)
@@ -30,28 +32,38 @@ namespace MyTodo.WebServer.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                response.IsSuccess = false;
+                response.Message = "账号或密码错误";
+                return Ok(response);
             }
 
             var newUserDTO = _mapper.Map<NewUserDTO>(user);
-            return Ok(newUserDTO);
+            response.IsSuccess = true;
+            response.Data = newUserDTO;
+            return Ok(response);
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDTO registerDTO)
         {
+            var response = new ApiResponse();
+
             var user = await _dbContext
                 .Users.Where(u => u.Email == registerDTO.Email)
                 .FirstOrDefaultAsync();
 
             if (user != null)
             {
-                return BadRequest("账号已被注册");
+                response.IsSuccess = false;
+                response.Message = "账号已被注册";
+                return Ok(response);
             }
 
             if (registerDTO.Password != registerDTO.ConfirmPassword)
             {
-                return BadRequest("密码不一致");
+                response.IsSuccess = false;
+                response.Message = "密码不一致";
+                return Ok(response);
             }
 
             var newUser = new User
@@ -65,7 +77,9 @@ namespace MyTodo.WebServer.Controllers
             await _dbContext.SaveChangesAsync();
 
             var newUserDTO = _mapper.Map<NewUserDTO>(registerDTO);
-            return Ok(newUserDTO);
+            response.IsSuccess = true;
+            response.Data = newUserDTO;
+            return Ok(response);
         }
     }
 }
