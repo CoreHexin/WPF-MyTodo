@@ -1,4 +1,6 @@
 ﻿using System.Windows.Controls;
+using MyTodo.Modules.Login.Events;
+using Prism.Events;
 
 namespace MyTodo.Modules.Login.Views
 {
@@ -7,9 +9,18 @@ namespace MyTodo.Modules.Login.Views
     /// </summary>
     public partial class LoginView : UserControl
     {
-        public LoginView()
+        private readonly IEventAggregator _eventAggregator;
+
+        public LoginView(IEventAggregator eventAggregator)
         {
             InitializeComponent();
+            _eventAggregator = eventAggregator;
+            _eventAggregator.GetEvent<PopupMessageEvent>().Subscribe(PopupMessage);
+        }
+
+        private void PopupMessage(string msg)
+        {
+            snackbar.MessageQueue.Enqueue(msg);
         }
     }
 }

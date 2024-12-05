@@ -27,6 +27,11 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <md:Snackbar
+            x:Name="snackbar"
+            Grid.ColumnSpan="2"
+            MessageQueue="{md:MessageQueue}" />
+
         <Image VerticalAlignment="Center" Source="../Images/login.png" />
 
         <md:Transitioner

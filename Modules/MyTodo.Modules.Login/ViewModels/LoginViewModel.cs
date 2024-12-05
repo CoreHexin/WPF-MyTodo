@@ -2,7 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using MyTodo.Core.Api;
 using MyTodo.Core.Models;
+using MyTodo.Modules.Login.Events;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 
@@ -11,6 +13,7 @@ namespace MyTodo.Modules.Login.ViewModels
     public class LoginViewModel : BindableBase, IDialogAware
     {
         private readonly MyTodoClient _myTodoClient;
+        private readonly IEventAggregator _eventAggregator;
 
         public string Title => "账号登录";
 
@@ -66,9 +69,10 @@ namespace MyTodo.Modules.Login.ViewModels
         public DelegateCommand SwitchCommand =>
             _switchCommand ?? (_switchCommand = new DelegateCommand(ExecuteSwitchCommand));
 
-        public LoginViewModel(MyTodoClient myTodoClient)
+        public LoginViewModel(MyTodoClient myTodoClient, IEventAggregator eventAggregator)
         {
             _myTodoClient = myTodoClient;
+            _eventAggregator = eventAggregator;
         }
 
         public bool CanCloseDialog()
@@ -85,10 +89,21 @@ namespace MyTodo.Modules.Login.ViewModels
             SelectedIndex = SelectedIndex == 0 ? 1 : 0;
         }
 
+        /// <summary>
+        /// 登录
+        /// </summary>
         private async void ExecuteLoginCommand()
         {
             var response = await _myTodoClient.LoginAsync(LoginModel);
-            RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
+
+            // 登录成功
+            if (response.IsSuccess)
+            {
+                RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
+                return;
+            }
+
+            _eventAggregator.GetEvent<PopupMessageEvent>().Publish(response.Message);
         }
 
         private bool CanExecuteLoginCommand()
@@ -96,18 +111,30 @@ namespace MyTodo.Modules.Login.ViewModels
             return Validator.TryValidateObject(LoginModel, new ValidationContext(LoginModel), null);
         }
 
+        /// <summary>
+        /// 注册
+        /// </summary>
         private async void ExecuteRegisterCommand()
         {
             var response = await _myTodoClient.RegisterAsync(RegisterModel);
 
-            // todo: 注册成功, 切换到登录
+            if (response.IsSuccess)
+            {
+                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("账号注册成功, 请登录");
+                ExecuteSwitchCommand();
+                return;
+            }
 
-            RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
+            _eventAggregator.GetEvent<PopupMessageEvent>().Publish(response.Message);
         }
 
         private bool CanExecuteRegisterCommand()
         {
-            return Validator.TryValidateObject(RegisterModel, new ValidationContext(RegisterModel), null);
+            return Validator.TryValidateObject(
+                RegisterModel,
+                new ValidationContext(RegisterModel),
+                null
+            );
         }
     }
 }
