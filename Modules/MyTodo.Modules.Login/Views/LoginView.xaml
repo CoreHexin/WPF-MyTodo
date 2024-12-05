@@ -99,11 +99,11 @@
                     <TextBox
                         Margin="0,20,0,0"
                         md:HintAssist.Hint="请输入昵称"
-                        Text="{Binding RegisterModel.Name}" />
+                        Text="{Binding RegisterModel.Name, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBox
                         Margin="0,20,0,0"
                         md:HintAssist.Hint="请输入邮箱"
-                        Text="{Binding RegisterModel.Email}" />
+                        Text="{Binding RegisterModel.Email, UpdateSourceTrigger=PropertyChanged}" />
                     <PasswordBox
                         Margin="0,20,0,0"
                         md:HintAssist.Hint="请输入密码"
