@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using MyTodo.Core.Api;
 using MyTodo.Modules.Login;
 using MyTodo.Modules.Login.Views;
 using MyTodo.Views;
@@ -21,7 +22,7 @@ namespace MyTodo
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-
+            containerRegistry.RegisterSingleton<MyTodoClient>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

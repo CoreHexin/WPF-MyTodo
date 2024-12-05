@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTodo.Modules.Login", "Mod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTodo.WebServer", "MyTodo.WebServer\MyTodo.WebServer.csproj", "{E1FB7CE4-8A84-4B58-AC5C-DC7E053FDF59}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTodo.Core", "MyTodo.Core\MyTodo.Core.csproj", "{D6D8A2A5-A6F3-47D7-A78A-FF3D9C137A74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{E1FB7CE4-8A84-4B58-AC5C-DC7E053FDF59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1FB7CE4-8A84-4B58-AC5C-DC7E053FDF59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1FB7CE4-8A84-4B58-AC5C-DC7E053FDF59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6D8A2A5-A6F3-47D7-A78A-FF3D9C137A74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6D8A2A5-A6F3-47D7-A78A-FF3D9C137A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6D8A2A5-A6F3-47D7-A78A-FF3D9C137A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6D8A2A5-A6F3-47D7-A78A-FF3D9C137A74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

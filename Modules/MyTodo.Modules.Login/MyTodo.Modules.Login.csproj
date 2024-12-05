@@ -7,8 +7,11 @@
     <None Remove="Images\login.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.1.0" />
     <PackageReference Include="Prism.Wpf" Version="8.1.97" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MyTodo.Core\MyTodo.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\login.png" />

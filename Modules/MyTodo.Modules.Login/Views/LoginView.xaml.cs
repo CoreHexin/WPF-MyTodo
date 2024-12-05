@@ -1,6 +1,4 @@
-﻿using MyTodo.Modules.Login.ViewModels;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace MyTodo.Modules.Login.Views
 {
@@ -12,14 +10,6 @@ namespace MyTodo.Modules.Login.Views
         public LoginView()
         {
             InitializeComponent();
-        }
-
-        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            if (DataContext != null)
-            {
-                ((LoginViewModel)DataContext).Password = ((PasswordBox)sender).Password;
-            }
         }
     }
 }
