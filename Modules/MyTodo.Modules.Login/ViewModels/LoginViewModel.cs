@@ -1,12 +1,12 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using MyTodo.Core.Api;
+﻿using MyTodo.Core.Api;
 using MyTodo.Core.Models;
 using MyTodo.Modules.Login.Events;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyTodo.Modules.Login.ViewModels
 {
@@ -16,6 +16,13 @@ namespace MyTodo.Modules.Login.ViewModels
         private readonly IEventAggregator _eventAggregator;
 
         public string Title => "账号登录";
+
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set { SetProperty(ref _isLoading, value); }
+        }
 
         private LoginModel _loginModel = new LoginModel();
         public LoginModel LoginModel
@@ -94,7 +101,9 @@ namespace MyTodo.Modules.Login.ViewModels
         /// </summary>
         private async void ExecuteLoginCommand()
         {
+            IsLoading = true;
             var response = await _myTodoClient.LoginAsync(LoginModel);
+            IsLoading = false;
 
             // 登录成功
             if (response.IsSuccess)
@@ -116,11 +125,14 @@ namespace MyTodo.Modules.Login.ViewModels
         /// </summary>
         private async void ExecuteRegisterCommand()
         {
+            IsLoading = true;
             var response = await _myTodoClient.RegisterAsync(RegisterModel);
+            IsLoading = false;
 
             if (response.IsSuccess)
             {
                 _eventAggregator.GetEvent<PopupMessageEvent>().Publish("账号注册成功, 请登录");
+                LoginModel.ClearModelWithoutValidate();
                 ExecuteSwitchCommand();
                 return;
             }

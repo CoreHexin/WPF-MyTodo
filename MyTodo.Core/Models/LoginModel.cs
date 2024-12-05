@@ -37,5 +37,16 @@ namespace MyTodo.Core.Models
                 }
             }
         }
+
+        /// <summary>
+        /// 清空数据，跳过验证
+        /// </summary>
+        public void ClearModelWithoutValidate()
+        {
+            _email = string.Empty;
+            _password = string.Empty;
+            RaisePropertyChanged(nameof(Email));
+            RaisePropertyChanged(nameof(Password));
+        }
     }
 }

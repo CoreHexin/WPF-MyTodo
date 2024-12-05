@@ -32,6 +32,22 @@
             Grid.ColumnSpan="2"
             MessageQueue="{md:MessageQueue}" />
 
+        <!--  加载动画  -->
+        <md:DialogHost
+            Grid.Column="2"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsOpen="{Binding IsLoading}">
+            <md:DialogHost.DialogContent>
+                <ProgressBar
+                    Margin="16"
+                    HorizontalAlignment="Center"
+                    IsIndeterminate="True"
+                    Style="{StaticResource MaterialDesignCircularProgressBar}"
+                    Value="0" />
+            </md:DialogHost.DialogContent>
+        </md:DialogHost>
+
         <Image VerticalAlignment="Center" Source="../Images/login.png" />
 
         <md:Transitioner
