@@ -16,15 +16,29 @@ namespace MyTodo.Core.Api
         public async Task<ApiResponse?> LoginAsync(LoginModel loginModel)
         {
             var request = new RestRequest("account/login").AddJsonBody(loginModel);
-            var response = await _client.PostAsync<ApiResponse>(request);
-            return response;
+            try
+            {
+                var response = await _client.PostAsync<ApiResponse>(request);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
         }
 
         public async Task<ApiResponse?> RegisterAsync(RegisterModel registerModel)
         {
             var request = new RestRequest("account/register").AddJsonBody(registerModel);
-            var response = await _client.PostAsync<ApiResponse>(request);
-            return response;
+            try
+            {
+                var response = await _client.PostAsync<ApiResponse>(request);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
         }
 
         public void Dispose()
