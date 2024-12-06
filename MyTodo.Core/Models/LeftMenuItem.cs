@@ -8,7 +8,7 @@
         // 菜单名称
         public string Name { get; set; }
 
-        // 视图名称
-        public string ViewName { get; set; }
+        // 目标视图名称
+        public string Target { get; set; }
     }
 }

@@ -12,7 +12,11 @@
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Modules\MyTodo.Modules.Index\MyTodo.Modules.Index.csproj" />
     <ProjectReference Include="..\Modules\MyTodo.Modules.Login\MyTodo.Modules.Login.csproj" />
+    <ProjectReference Include="..\Modules\MyTodo.Modules.Memo\MyTodo.Modules.Memo.csproj" />
+    <ProjectReference Include="..\Modules\MyTodo.Modules.Settings\MyTodo.Modules.Settings.csproj" />
+    <ProjectReference Include="..\Modules\MyTodo.Modules.Todo\MyTodo.Modules.Todo.csproj" />
     <ProjectReference Include="..\MyTodo.Core\MyTodo.Core.csproj" />
   </ItemGroup>
   <ItemGroup>

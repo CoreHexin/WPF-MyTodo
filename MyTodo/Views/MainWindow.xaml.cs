@@ -40,5 +40,11 @@ namespace MyTodo.Views
         {
             WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
         }
+
+        // 收起左侧抽屉菜单栏
+        private void ListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            MenuToggleButton.IsChecked = false;
+        }
     }
 }
