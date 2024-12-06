@@ -5,11 +5,17 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Images\user.jpg" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="5.1.0" />
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Modules\MyTodo.Modules.Login\MyTodo.Modules.Login.csproj" />
     <ProjectReference Include="..\MyTodo.Core\MyTodo.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\user.jpg" />
   </ItemGroup>
 </Project>
