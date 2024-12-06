@@ -9,6 +9,7 @@
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True"
     WindowStartupLocation="CenterScreen">
+    
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="0" />
     </WindowChrome.WindowChrome>
@@ -24,7 +25,42 @@
             OpenMode="Modal">
 
             <materialDesign:DrawerHost.LeftDrawerContent>
-                <DockPanel MinWidth="220" />
+                <StackPanel MinWidth="220">
+                    <Image
+                        Width="50"
+                        Margin="0,20"
+                        Source="/Images/user.jpg">
+                        <Image.Clip>
+                            <EllipseGeometry
+                                Center="25,25"
+                                RadiusX="25"
+                                RadiusY="25" />
+                        </Image.Clip>
+                    </Image>
+
+                    <ListBox
+                        Margin="10,0"
+                        ItemsSource="{Binding LeftMenuItems}"
+                        SelectedItem="{Binding SelectedMenu}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Height="30" Orientation="Horizontal">
+                                    <materialDesign:PackIcon
+                                        Width="20"
+                                        Height="20"
+                                        Margin="0,0,10,0"
+                                        VerticalAlignment="Center"
+                                        Kind="{Binding Icon}" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontSize="15"
+                                        Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                </StackPanel>
             </materialDesign:DrawerHost.LeftDrawerContent>
 
             <Grid>
@@ -37,7 +73,8 @@
                 <materialDesign:ColorZone
                     Padding="16"
                     Mode="Standard"
-                    MouseLeftButtonDown="ColorZone_MouseLeftButtonDown" MouseDoubleClick="ColorZone_MouseDoubleClick">
+                    MouseDoubleClick="ColorZone_MouseDoubleClick"
+                    MouseLeftButtonDown="ColorZone_MouseLeftButtonDown">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" />
@@ -49,7 +86,7 @@
                                 x:Name="MenuToggleButton"
                                 Margin="5,0,24,0"
                                 AutomationProperties.Name="HamburgerToggleButton"
-                                IsChecked="False"
+                                IsChecked="True"
                                 Style="{StaticResource MaterialDesignHamburgerToggleButton}" />
 
                             <Button
@@ -78,6 +115,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontSize="22"
+                            FontWeight="Bold"
                             Text="待办事项" />
 
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
