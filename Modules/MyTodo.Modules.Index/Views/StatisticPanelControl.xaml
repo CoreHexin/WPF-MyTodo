@@ -1,0 +1,63 @@
+﻿<UserControl
+    x:Class="MyTodo.Modules.Index.Views.StatisticPanelControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MyTodo.Modules.Index.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Height="150"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+
+    <Border Background="{Binding Background, FallbackValue=#FF0CA0FF}" CornerRadius="10">
+        <Grid>
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <materialDesign:PackIcon
+                    Width="30"
+                    Height="30"
+                    VerticalAlignment="Center"
+                    Foreground="White"
+                    Kind="{Binding Icon, FallbackValue=Cog}" />
+
+                <TextBlock
+                    Grid.Row="1"
+                    VerticalAlignment="Center"
+                    FontSize="18"
+                    Foreground="White"
+                    Text="{Binding Title, FallbackValue=汇总}" />
+
+                <TextBlock
+                    Grid.Row="2"
+                    VerticalAlignment="Center"
+                    FontSize="28"
+                    Foreground="White"
+                    Text="{Binding Content, FallbackValue=80}" />
+
+            </Grid>
+
+            <Canvas ClipToBounds="True">
+                <Ellipse
+                    Canvas.Top="10"
+                    Canvas.Right="-40"
+                    Width="100"
+                    Height="100"
+                    Fill="White"
+                    Opacity="0.1" />
+                <Ellipse
+                    Canvas.Top="60"
+                    Canvas.Right="-10"
+                    Width="100"
+                    Height="100"
+                    Fill="White"
+                    Opacity="0.1" />
+            </Canvas>
+        </Grid>
+    </Border>
+</UserControl>

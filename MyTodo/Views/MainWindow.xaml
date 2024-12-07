@@ -10,6 +10,7 @@
     Width="1200"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True"
+    FontFamily="微软雅黑"
     WindowStartupLocation="CenterScreen">
 
     <WindowChrome.WindowChrome>
