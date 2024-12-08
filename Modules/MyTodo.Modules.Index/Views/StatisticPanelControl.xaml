@@ -10,7 +10,27 @@
     d:DesignWidth="400"
     mc:Ignorable="d">
 
-    <Border Background="{Binding Background, FallbackValue=#FF0CA0FF}" CornerRadius="10">
+    <UserControl.Resources>
+        <Style x:Key="borderShadowStyle" TargetType="Border">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect
+                                BlurRadius="10"
+                                ShadowDepth="3"
+                                Color="#DDDDDD" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Border
+        Background="{Binding Background, FallbackValue=#FF0CA0FF}"
+        CornerRadius="10"
+        Style="{StaticResource borderShadowStyle}">
         <Grid>
             <Grid Margin="20">
                 <Grid.RowDefinitions>
