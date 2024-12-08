@@ -11,6 +11,7 @@
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True"
     FontFamily="微软雅黑"
+    Style="{StaticResource MaterialDesignWindow}"
     WindowStartupLocation="CenterScreen">
 
     <WindowChrome.WindowChrome>
@@ -77,7 +78,7 @@
                 <!--  标题栏  -->
                 <materialDesign:ColorZone
                     Padding="16"
-                    Mode="Standard"
+                    Mode="PrimaryDark"
                     MouseDoubleClick="ColorZone_MouseDoubleClick"
                     MouseLeftButtonDown="ColorZone_MouseLeftButtonDown">
                     <Grid>

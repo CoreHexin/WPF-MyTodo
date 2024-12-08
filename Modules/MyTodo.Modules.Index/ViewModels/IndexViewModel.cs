@@ -1,6 +1,6 @@
-﻿using MyTodo.Core.Models;
+﻿using System.Collections.ObjectModel;
+using MyTodo.Core.Models;
 using Prism.Mvvm;
-using System.Collections.ObjectModel;
 
 namespace MyTodo.Modules.Index.ViewModels
 {
@@ -13,9 +13,51 @@ namespace MyTodo.Modules.Index.ViewModels
             set { SetProperty(ref _statisticPanels, value); }
         }
 
+        private ObservableCollection<TodoItem> _todoItems;
+        public ObservableCollection<TodoItem> TodoItems
+        {
+            get { return _todoItems; }
+            set { SetProperty(ref _todoItems, value); }
+        }
+
+        private ObservableCollection<MemoItem> _memoItems;
+        public ObservableCollection<MemoItem> MemoItems
+        {
+            get { return _memoItems; }
+            set { SetProperty(ref _memoItems, value); }
+        }
+
         public IndexViewModel()
         {
             CreateStatisticPanels();
+            CreateTestData();
+        }
+
+        private void CreateTestData()
+        {
+            TodoItems = new ObservableCollection<TodoItem>();
+            MemoItems = new ObservableCollection<MemoItem>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                TodoItems.Add(
+                    new TodoItem()
+                    {
+                        Id = i,
+                        Title = $"待办事项标题{i}",
+                        Content = $"待办内容{i}",
+                    }
+                );
+
+                MemoItems.Add(
+                    new MemoItem()
+                    {
+                        Id = i,
+                        Title = $"备忘录标题{i}",
+                        Content = $"备忘录内容{i}",
+                    }
+                );
+            }
         }
 
         private void CreateStatisticPanels()
