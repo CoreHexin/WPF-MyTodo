@@ -1,0 +1,9 @@
+﻿<UserControl
+    x:Class="MyTodo.Modules.Settings.Views.SystemSettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:prism="http://prismlibrary.com/">
+    <Grid>
+        <TextBlock FontSize="22" Text="系统设置" />
+    </Grid>
+</UserControl>

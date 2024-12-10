@@ -16,6 +16,9 @@ namespace MyTodo.Modules.Settings
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<SettingsView, SettingsViewModel>();
+            containerRegistry.RegisterForNavigation<CustomizationView, CustomizationViewModel>();
+            containerRegistry.RegisterForNavigation<SystemSettingsView>();
+            containerRegistry.RegisterForNavigation<AboutView>();
         }
     }
 }

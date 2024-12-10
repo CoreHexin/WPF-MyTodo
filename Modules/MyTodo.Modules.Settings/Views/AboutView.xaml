@@ -1,0 +1,9 @@
+﻿<UserControl
+    x:Class="MyTodo.Modules.Settings.Views.AboutView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:prism="http://prismlibrary.com/">
+    <Grid>
+        <TextBlock FontSize="22" Text="关于" />
+    </Grid>
+</UserControl>
