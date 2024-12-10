@@ -44,7 +44,7 @@
             <Border
                 Grid.Column="0"
                 Margin="10"
-                Background="#dddddd"
+                Background="{StaticResource MaterialDesign.Brush.Primary.Light}"
                 CornerRadius="10">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -97,7 +97,7 @@
             <Border
                 Grid.Column="1"
                 Margin="10"
-                Background="#dddddd"
+                Background="{StaticResource MaterialDesign.Brush.Primary.Light}"
                 CornerRadius="10">
                 <Grid>
                     <Grid.RowDefinitions>

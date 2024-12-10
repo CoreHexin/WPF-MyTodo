@@ -5,6 +5,15 @@
     xmlns:prism="http://prismlibrary.com/"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <Grid>
-        <TextBlock FontSize="22" Text="个性化" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Text="浅色" />
+            <ToggleButton Margin="8,0,16,0" IsChecked="{Binding IsDarkTheme}" />
+            <TextBlock VerticalAlignment="Center" Text="深色" />
+        </StackPanel>
     </Grid>
 </UserControl>
