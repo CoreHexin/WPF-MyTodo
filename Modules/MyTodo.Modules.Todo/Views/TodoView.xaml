@@ -45,7 +45,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <StackPanel Margin="15,10" Orientation="Horizontal">
+                <StackPanel Margin="20,10" Orientation="Horizontal">
                     <TextBox
                         VerticalAlignment="Center"
                         materialDesign:HintAssist.Hint="查找待办事项..."
@@ -64,7 +64,7 @@
                 </StackPanel>
 
                 <Button
-                    Margin="10,0"
+                    Margin="20,0"
                     HorizontalAlignment="Right"
                     Command="{Binding OpenRightDrawerCommand}"
                     Content="添加待办" />
@@ -83,48 +83,50 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border
-                                    Margin="5"
-                                    Background="{StaticResource MaterialDesign.Brush.Primary.Light}"
-                                    CornerRadius="5">
-                                    <Grid Width="220" Height="180">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition />
-                                        </Grid.RowDefinitions>
-                                        <TextBlock
-                                            Margin="10"
-                                            VerticalAlignment="Center"
-                                            FontWeight="Bold"
-                                            Text="{Binding Title}" />
-                                        <materialDesign:PopupBox
-                                            Margin="10"
-                                            HorizontalAlignment="Right"
-                                            Panel.ZIndex="1">
-                                            <Button Content="删除" />
-                                        </materialDesign:PopupBox>
-                                        <TextBlock
-                                            Grid.Row="1"
-                                            Margin="10,0,10,10"
-                                            Text="{Binding Content}" />
-                                        <Canvas Grid.RowSpan="2" ClipToBounds="True">
-                                            <Ellipse
-                                                Canvas.Top="20"
-                                                Canvas.Right="-40"
-                                                Width="120"
-                                                Height="120"
-                                                Fill="White"
-                                                Opacity="0.1" />
-                                            <Ellipse
-                                                Canvas.Top="80"
-                                                Canvas.Right="-10"
-                                                Width="120"
-                                                Height="120"
-                                                Fill="White"
-                                                Opacity="0.1" />
-                                        </Canvas>
-                                    </Grid>
-                                </Border>
+                                <materialDesign:TransitioningContent OpeningEffect="{materialDesign:TransitionEffect Kind=ExpandIn}">
+                                    <Border
+                                        Margin="5"
+                                        Background="{StaticResource MaterialDesign.Brush.Primary.Light}"
+                                        CornerRadius="5">
+                                        <Grid Width="220" Height="180">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+                                            <TextBlock
+                                                Margin="10"
+                                                VerticalAlignment="Center"
+                                                FontWeight="Bold"
+                                                Text="{Binding Title}" />
+                                            <materialDesign:PopupBox
+                                                Margin="10"
+                                                HorizontalAlignment="Right"
+                                                Panel.ZIndex="1">
+                                                <Button Content="删除" />
+                                            </materialDesign:PopupBox>
+                                            <TextBlock
+                                                Grid.Row="1"
+                                                Margin="10,0,10,10"
+                                                Text="{Binding Content}" />
+                                            <Canvas Grid.RowSpan="2" ClipToBounds="True">
+                                                <Ellipse
+                                                    Canvas.Top="20"
+                                                    Canvas.Right="-40"
+                                                    Width="120"
+                                                    Height="120"
+                                                    Fill="White"
+                                                    Opacity="0.1" />
+                                                <Ellipse
+                                                    Canvas.Top="80"
+                                                    Canvas.Right="-10"
+                                                    Width="120"
+                                                    Height="120"
+                                                    Fill="White"
+                                                    Opacity="0.1" />
+                                            </Canvas>
+                                        </Grid>
+                                    </Border>
+                                </materialDesign:TransitioningContent>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
