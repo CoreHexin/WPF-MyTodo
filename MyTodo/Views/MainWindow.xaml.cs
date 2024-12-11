@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using MyTodo.ViewModels;
+using System.Windows;
 using System.Windows.Input;
 
 namespace MyTodo.Views
@@ -11,6 +12,13 @@ namespace MyTodo.Views
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 加载默认页面
+            ((MainWindowViewModel)DataContext).InitDefaultPage();
         }
 
         private void ColorZone_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

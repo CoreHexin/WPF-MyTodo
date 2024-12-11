@@ -62,6 +62,15 @@ namespace MyTodo.ViewModels
         }
 
         /// <summary>
+        /// 设置默认页面
+        /// </summary>
+        public void InitDefaultPage()
+        {
+            SelectedMenu = LeftMenuItems[0];
+            Navigate();
+        }
+
+        /// <summary>
         /// 导航
         /// </summary>
         private void Navigate()
