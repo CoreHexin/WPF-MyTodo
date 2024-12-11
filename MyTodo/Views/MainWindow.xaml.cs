@@ -1,4 +1,6 @@
-﻿using MyTodo.ViewModels;
+﻿using MyTodo.Core.Events;
+using MyTodo.ViewModels;
+using Prism.Events;
 using System.Windows;
 using System.Windows.Input;
 
@@ -9,10 +11,15 @@ namespace MyTodo.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly IEventAggregator _eventAggregator;
+
+        public MainWindow(IEventAggregator eventAggregator)
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
+
+            _eventAggregator = eventAggregator;
+            _eventAggregator.GetEvent<PopupMessageEvent>().Subscribe(PopupMessage);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -54,5 +61,10 @@ namespace MyTodo.Views
         {
             MenuToggleButton.IsChecked = false;
         }
+        private void PopupMessage(string msg)
+        {
+            snackbar.MessageQueue.Enqueue(msg);
+        }
+
     }
 }

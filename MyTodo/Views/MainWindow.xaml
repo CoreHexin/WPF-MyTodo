@@ -154,6 +154,12 @@
 
                 <!--  内容区域  -->
                 <ContentControl Grid.Row="1" prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}" />
+
+                <!--  弹出消息区域  -->
+                <materialDesign:Snackbar
+                    x:Name="snackbar"
+                    Grid.Row="1"
+                    MessageQueue="{materialDesign:MessageQueue}" />
             </Grid>
         </materialDesign:DrawerHost>
 
