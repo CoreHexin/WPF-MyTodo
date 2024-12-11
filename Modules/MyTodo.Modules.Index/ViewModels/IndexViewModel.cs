@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Windows;
 using MyTodo.Core.Models;
 using Prism.Mvvm;
 
@@ -6,6 +8,13 @@ namespace MyTodo.Modules.Index.ViewModels
 {
     public class IndexViewModel : BindableBase
     {
+        private string _welcomeMessage;
+        public string WelcomeMessage
+        {
+            get { return _welcomeMessage; }
+            set { SetProperty(ref _welcomeMessage, value); }
+        }
+
         private ObservableCollection<StatisticPanel> _statisticPanels;
         public ObservableCollection<StatisticPanel> StatisticPanels
         {
@@ -31,6 +40,27 @@ namespace MyTodo.Modules.Index.ViewModels
         {
             CreateStatisticPanels();
             CreateTestData();
+
+            UpdateWelcomeMessage();
+        }
+
+        private void UpdateWelcomeMessage()
+        {
+            string[] weeks = new string[]
+            {
+                "星期日",
+                "星期一",
+                "星期二",
+                "星期三",
+                "星期四",
+                "星期五",
+                "星期六",
+            };
+
+            var p = Application.Current.Properties;
+            string userName = ((UserApiModel)Application.Current.Properties["User"]).Name;
+            WelcomeMessage =
+                $"你好, {userName}, 今天是{DateTime.Now.ToString("yyyy-MM-dd")} {weeks[(int)DateTime.Now.DayOfWeek]}";
         }
 
         private void CreateTestData()

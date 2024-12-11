@@ -1,4 +1,5 @@
 ﻿using MyTodo.Core.Api;
+using MyTodo.Core.Helpers;
 using MyTodo.Core.Models;
 using MyTodo.Modules.Login.Events;
 using Prism.Commands;
@@ -7,6 +8,7 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace MyTodo.Modules.Login.ViewModels
 {
@@ -108,8 +110,15 @@ namespace MyTodo.Modules.Login.ViewModels
             // 登录成功
             if (response.IsSuccess)
             {
-                RequestClose?.Invoke(new DialogResult(ButtonResult.OK));
-                return;
+                if (response.Data is JsonElement jsonElement)
+                {
+                    var user = jsonElement.Deserialize<UserApiModel>(JsonHelper.Options);
+                    
+                    DialogParameters dialogParameters = new DialogParameters();
+                    dialogParameters.Add("User", user);
+                    RequestClose?.Invoke(new DialogResult(ButtonResult.OK, dialogParameters));
+                    return;
+                }
             }
 
             _eventAggregator.GetEvent<PopupMessageEvent>().Publish(response.Message);

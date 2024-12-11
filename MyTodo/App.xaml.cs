@@ -1,6 +1,5 @@
-﻿using System;
-using System.Windows;
-using MyTodo.Core.Api;
+﻿using MyTodo.Core.Api;
+using MyTodo.Core.Models;
 using MyTodo.Modules.Index;
 using MyTodo.Modules.Login;
 using MyTodo.Modules.Login.Views;
@@ -11,6 +10,8 @@ using MyTodo.Views;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Services.Dialogs;
+using System;
+using System.Windows;
 
 namespace MyTodo
 {
@@ -60,6 +61,13 @@ namespace MyTodo
                 Environment.Exit(0);
                 return;
             }
+
+            if (result.Parameters.ContainsKey("User"))
+            {
+                UserApiModel user = result.Parameters.GetValue<UserApiModel>("User");
+                Current.Properties.Add("User", user);
+            }
+
             base.OnInitialized();
         }
     }

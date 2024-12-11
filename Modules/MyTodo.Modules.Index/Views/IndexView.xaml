@@ -15,9 +15,9 @@
         </Grid.RowDefinitions>
 
         <TextBlock
-            Margin="20"
+            Margin="15,10"
             FontSize="22"
-            Text="2024年12月06日，星期五" />
+            Text="{Binding WelcomeMessage}" />
 
         <!--  统计面板  -->
         <ItemsControl Grid.Row="1" ItemsSource="{Binding StatisticPanels}">
