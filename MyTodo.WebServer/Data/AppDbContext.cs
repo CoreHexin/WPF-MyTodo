@@ -6,6 +6,7 @@ namespace MyTodo.WebServer.Data
     public class AppDbContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Todo> Todos { get; set; }
 
         public AppDbContext(DbContextOptions options) : base(options) { }
 
