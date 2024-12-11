@@ -27,7 +27,7 @@ namespace MyTodo
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<MyTodoClient>();
+            containerRegistry.RegisterSingleton<ApiClient>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

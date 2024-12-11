@@ -14,7 +14,7 @@ namespace MyTodo.Modules.Login.ViewModels
 {
     public class LoginViewModel : BindableBase, IDialogAware
     {
-        private readonly MyTodoClient _myTodoClient;
+        private readonly ApiClient _myTodoClient;
         private readonly IEventAggregator _eventAggregator;
 
         public string Title => "账号登录";
@@ -78,7 +78,7 @@ namespace MyTodo.Modules.Login.ViewModels
         public DelegateCommand SwitchCommand =>
             _switchCommand ?? (_switchCommand = new DelegateCommand(ExecuteSwitchCommand));
 
-        public LoginViewModel(MyTodoClient myTodoClient, IEventAggregator eventAggregator)
+        public LoginViewModel(ApiClient myTodoClient, IEventAggregator eventAggregator)
         {
             _myTodoClient = myTodoClient;
             _eventAggregator = eventAggregator;

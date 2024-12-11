@@ -6,11 +6,11 @@ using RestSharp;
 
 namespace MyTodo.Core.Api
 {
-    public class MyTodoClient : IDisposable
+    public class ApiClient : IDisposable
     {
         private readonly RestClient _client;
 
-        public MyTodoClient()
+        public ApiClient()
         {
             var options = new RestClientOptions("https://localhost:7246/api");
             _client = new RestClient(options);
