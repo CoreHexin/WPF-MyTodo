@@ -5,6 +5,6 @@
         public int TotalCount { get; set; }
         public int FinishedCount { get; set; }
         public string FinishedRatio =>
-            TotalCount == 0 ? "0" : (FinishedCount / TotalCount * 100.0).ToString("f2") + "%";
+            TotalCount == 0 ? "0" : (FinishedCount * 100.0 / TotalCount).ToString("f2") + "%";
     }
 }
