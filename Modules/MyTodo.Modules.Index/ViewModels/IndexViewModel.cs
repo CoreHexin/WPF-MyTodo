@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Text.Json;
 using System.Windows;
+using MyTodo.Core.Api;
+using MyTodo.Core.DTOs;
+using MyTodo.Core.Events;
+using MyTodo.Core.Helpers;
 using MyTodo.Core.Models;
+using Prism.Events;
 using Prism.Mvvm;
 
 namespace MyTodo.Modules.Index.ViewModels
 {
     public class IndexViewModel : BindableBase
     {
+        private readonly ApiClient _apiClient;
+        private readonly IEventAggregator _eventAggregator;
+
         private string _welcomeMessage;
         public string WelcomeMessage
         {
@@ -30,18 +39,21 @@ namespace MyTodo.Modules.Index.ViewModels
         }
 
         private ObservableCollection<MemoItem> _memoItems;
+
         public ObservableCollection<MemoItem> MemoItems
         {
             get { return _memoItems; }
             set { SetProperty(ref _memoItems, value); }
         }
 
-        public IndexViewModel()
+        public IndexViewModel(ApiClient apiClient, IEventAggregator eventAggregator)
         {
-            CreateStatisticPanels();
-            CreateTestData();
+            _apiClient = apiClient;
+            _eventAggregator = eventAggregator;
 
             UpdateWelcomeMessage();
+            CreateStatisticPanels();
+            CreateTestData();
         }
 
         private void UpdateWelcomeMessage()
@@ -57,7 +69,6 @@ namespace MyTodo.Modules.Index.ViewModels
                 "星期六",
             };
 
-            var p = Application.Current.Properties;
             string userName = ((UserApiModel)Application.Current.Properties["User"]).Name;
             WelcomeMessage =
                 $"你好, {userName}, 今天是{DateTime.Now.ToString("yyyy-MM-dd")} {weeks[(int)DateTime.Now.DayOfWeek]}";
@@ -90,6 +101,9 @@ namespace MyTodo.Modules.Index.ViewModels
             }
         }
 
+        /// <summary>
+        /// 创建统计面板
+        /// </summary>
         private void CreateStatisticPanels()
         {
             StatisticPanels = new ObservableCollection<StatisticPanel>()
@@ -98,7 +112,7 @@ namespace MyTodo.Modules.Index.ViewModels
                 {
                     Icon = "ClockFast",
                     Title = "汇总",
-                    Content = "10",
+                    Content = "",
                     Background = "#FF0CA0FF",
                     Target = "",
                 },
@@ -106,7 +120,7 @@ namespace MyTodo.Modules.Index.ViewModels
                 {
                     Icon = "ClockCheckOutline",
                     Title = "已完成",
-                    Content = "10",
+                    Content = "",
                     Background = "#FF1ECA3A",
                     Target = "",
                 },
@@ -114,7 +128,7 @@ namespace MyTodo.Modules.Index.ViewModels
                 {
                     Icon = "ChartLineVariant",
                     Title = "完成率",
-                    Content = "80%",
+                    Content = "",
                     Background = "#FF02C6DC",
                     Target = "",
                 },
@@ -127,6 +141,31 @@ namespace MyTodo.Modules.Index.ViewModels
                     Target = "",
                 },
             };
+
+            RefreshStatisticPanels();
+        }
+
+        /// <summary>
+        /// 更新统计面板数据
+        /// </summary>
+        private async void RefreshStatisticPanels()
+        {
+            ApiResponse response = await _apiClient.GetTodoStatistic();
+
+            if (response.IsSuccess != true)
+            {
+                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("获取统计数据异常");
+                return;
+            }
+
+            var statisticDTO = JsonSerializer.Deserialize<StatisticDTO>(
+                (JsonElement)response.Data,
+                JsonHelper.Options
+            );
+
+            StatisticPanels[0].Content = statisticDTO.TotalCount.ToString();
+            StatisticPanels[1].Content = statisticDTO.FinishedCount.ToString();
+            StatisticPanels[2].Content = statisticDTO.FinishedRatio;
         }
     }
 }
