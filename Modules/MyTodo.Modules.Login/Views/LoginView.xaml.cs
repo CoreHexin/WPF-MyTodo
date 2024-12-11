@@ -1,5 +1,5 @@
 ﻿using System.Windows.Controls;
-using MyTodo.Modules.Login.Events;
+using MyTodo.Core.Events;
 using Prism.Events;
 
 namespace MyTodo.Modules.Login.Views

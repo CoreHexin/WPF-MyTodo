@@ -1,7 +1,7 @@
 ﻿using MyTodo.Core.Api;
+using MyTodo.Core.Events;
 using MyTodo.Core.Helpers;
 using MyTodo.Core.Models;
-using MyTodo.Modules.Login.Events;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -14,7 +14,7 @@ namespace MyTodo.Modules.Login.ViewModels
 {
     public class LoginViewModel : BindableBase, IDialogAware
     {
-        private readonly ApiClient _myTodoClient;
+        private readonly ApiClient _apiClient;
         private readonly IEventAggregator _eventAggregator;
 
         public string Title => "账号登录";
@@ -78,9 +78,9 @@ namespace MyTodo.Modules.Login.ViewModels
         public DelegateCommand SwitchCommand =>
             _switchCommand ?? (_switchCommand = new DelegateCommand(ExecuteSwitchCommand));
 
-        public LoginViewModel(ApiClient myTodoClient, IEventAggregator eventAggregator)
+        public LoginViewModel(ApiClient apiClient, IEventAggregator eventAggregator)
         {
-            _myTodoClient = myTodoClient;
+            _apiClient = apiClient;
             _eventAggregator = eventAggregator;
         }
 
@@ -104,7 +104,7 @@ namespace MyTodo.Modules.Login.ViewModels
         private async void ExecuteLoginCommand()
         {
             IsLoading = true;
-            var response = await _myTodoClient.LoginAsync(LoginModel);
+            var response = await _apiClient.LoginAsync(LoginModel);
             IsLoading = false;
 
             // 登录成功
@@ -135,7 +135,7 @@ namespace MyTodo.Modules.Login.ViewModels
         private async void ExecuteRegisterCommand()
         {
             IsLoading = true;
-            var response = await _myTodoClient.RegisterAsync(RegisterModel);
+            var response = await _apiClient.RegisterAsync(RegisterModel);
             IsLoading = false;
 
             if (response.IsSuccess)

@@ -1,6 +1,6 @@
 ﻿using Prism.Events;
 
-namespace MyTodo.Modules.Login.Events
+namespace MyTodo.Core.Events
 {
     public class PopupMessageEvent : PubSubEvent<string> { }
 }
