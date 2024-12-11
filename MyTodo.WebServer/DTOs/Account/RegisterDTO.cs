@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyTodo.WebServer.DTOs
+namespace MyTodo.WebServer.DTOs.Account
 {
     public class RegisterDTO
     {

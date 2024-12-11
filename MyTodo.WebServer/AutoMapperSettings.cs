@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MyTodo.WebServer.DTOs;
+using MyTodo.WebServer.DTOs.Account;
 using MyTodo.WebServer.Models;
 
 namespace MyTodo.WebServer

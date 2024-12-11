@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyTodo.WebServer.Data;
-using MyTodo.WebServer.DTOs;
+using MyTodo.WebServer.DTOs.Account;
 using MyTodo.WebServer.Models;
 
 namespace MyTodo.WebServer.Controllers
