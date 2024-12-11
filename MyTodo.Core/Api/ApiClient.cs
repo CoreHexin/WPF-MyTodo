@@ -61,6 +61,54 @@ namespace MyTodo.Core.Api
                     Message = $"服务器响应异常: {(int)response.StatusCode}",
                 };
             }
+
+            if (response.Content == null)
+            {
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"服务器响应异常: 响应内容为空",
+                };
+            }
+
+            return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
+        }
+
+        /// <summary>
+        /// 请求待办事项统计接口
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiResponse?> GetTodoStatistic()
+        {
+            RestResponse response;
+            var request = new RestRequest("todo/statistic");
+            try
+            {
+                response = await _client.GetAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"服务器响应异常: {(int)response.StatusCode}",
+                };
+            }
+
+            if (response.Content == null)
+            {
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"服务器响应异常: 响应内容为空",
+                };
+            }
+
             return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
         }
 
