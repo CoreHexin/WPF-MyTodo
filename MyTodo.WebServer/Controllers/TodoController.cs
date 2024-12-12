@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyTodo.WebServer.Data;
 using MyTodo.WebServer.DTOs.Todo;
+using MyTodo.WebServer.Models;
 
 namespace MyTodo.WebServer.Controllers
 {
@@ -45,6 +46,44 @@ namespace MyTodo.WebServer.Controllers
                 TotalCount = totalCount,
                 FinishedCount = finishedCount,
             };
+            return Ok(response);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveTodoItemAsync(TodoItemDTO todoItemDTO)
+        {
+            var response = new ApiResponse();
+
+            var now = DateTime.Now;
+            var newTodo = new Todo()
+            {
+                Title = todoItemDTO.Title,
+                Content = todoItemDTO.Content,
+                Status = todoItemDTO.Status,
+                CreatedAt = now,
+                UpdatedAt = now,
+            };
+            _appDbContext.Todos.Add(newTodo);
+            await _appDbContext.SaveChangesAsync();
+
+            await Task.Delay(2000);
+            response.IsSuccess = true;
+            response.Data = newTodo;
+            return Ok(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTodoItemsAsync()
+        {
+            var response = new ApiResponse();
+
+            var todoItems = await _appDbContext
+                .Todos.OrderBy(t => t.Status)
+                .ThenByDescending(t => t.CreatedAt)
+                .ToListAsync();
+
+            response.IsSuccess = true;
+            response.Data = todoItems;
             return Ok(response);
         }
     }
