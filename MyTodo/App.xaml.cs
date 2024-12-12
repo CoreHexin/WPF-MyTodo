@@ -54,17 +54,17 @@ namespace MyTodo
             dialogService.ShowDialog(nameof(LoginView), LoginCallback);
         }
 
-        private void LoginCallback(IDialogResult result)
+        private void LoginCallback(IDialogResult dialogResult)
         {
-            if (result.Result != ButtonResult.OK)
+            if (dialogResult.Result != ButtonResult.OK)
             {
                 Environment.Exit(0);
                 return;
             }
 
-            if (result.Parameters.ContainsKey("User"))
+            if (dialogResult.Parameters.ContainsKey("User"))
             {
-                UserApiModel user = result.Parameters.GetValue<UserApiModel>("User");
+                UserApiModel user = dialogResult.Parameters.GetValue<UserApiModel>("User");
                 Current.Properties.Add("User", user);
             }
 

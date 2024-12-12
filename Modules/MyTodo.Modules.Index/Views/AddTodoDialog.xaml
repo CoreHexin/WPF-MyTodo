@@ -21,6 +21,23 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
+        <!--  加载动画  -->
+        <materialDesign:DialogHost
+            Grid.RowSpan="5"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsOpen="{Binding IsLoading}">
+            <materialDesign:DialogHost.DialogContent>
+                <ProgressBar
+                    Margin="16"
+                    HorizontalAlignment="Center"
+                    IsIndeterminate="True"
+                    Style="{StaticResource MaterialDesignCircularProgressBar}"
+                    Value="0" />
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+
         <TextBlock
             Grid.Row="0"
             FontSize="30"
@@ -38,13 +55,17 @@
                 <ComboBoxItem>已完成</ComboBoxItem>
             </ComboBox>
         </StackPanel>
-        <TextBox Grid.Row="2" materialDesign:HintAssist.Hint="请输入待办标题" />
+        <TextBox
+            Grid.Row="2"
+            materialDesign:HintAssist.Hint="请输入待办标题"
+            Text="{Binding TodoItemDTO.Title, UpdateSourceTrigger=PropertyChanged}" />
         <TextBox
             Grid.Row="3"
-            Margin="0,10"
+            Margin="0,20"
             VerticalContentAlignment="Top"
             materialDesign:HintAssist.Hint="请输入待办内容"
             AcceptsReturn="True"
+            Text="{Binding TodoItemDTO.Content, UpdateSourceTrigger=PropertyChanged}"
             TextWrapping="Wrap" />
         <StackPanel
             Grid.Row="4"
@@ -53,8 +74,12 @@
             <Button
                 Width="100"
                 Margin="0,0,10,0"
+                Command="{Binding CancelCommand}"
                 Content="取消" />
-            <Button Width="100" Content="确定" />
+            <Button
+                Width="100"
+                Command="{Binding SaveCommand}"
+                Content="确定" />
         </StackPanel>
     </Grid>
 

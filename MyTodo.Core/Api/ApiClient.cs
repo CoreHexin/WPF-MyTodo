@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using MyTodo.Core.DTOs;
 using MyTodo.Core.Helpers;
 using MyTodo.Core.Models;
 using RestSharp;
@@ -37,6 +38,16 @@ namespace MyTodo.Core.Api
                     Message = $"服务器响应异常: {(int)response.StatusCode}",
                 };
             }
+
+            if (response.Content == null)
+            {
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"服务器响应异常: 响应内容为空",
+                };
+            }
+
             return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
         }
 
@@ -78,10 +89,87 @@ namespace MyTodo.Core.Api
         /// 请求待办事项统计接口
         /// </summary>
         /// <returns></returns>
-        public async Task<ApiResponse?> GetTodoStatistic()
+        public async Task<ApiResponse?> GetTodoStatisticAsync()
         {
             RestResponse response;
             var request = new RestRequest("todo/statistic");
+            try
+            {
+                response = await _client.GetAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"服务器响应异常: {(int)response.StatusCode}",
+                };
+            }
+
+            if (response.Content == null)
+            {
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"服务器响应异常: 响应内容为空",
+                };
+            }
+
+            return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
+        }
+
+        /// <summary>
+        /// 保存待办事项数据
+        /// </summary>
+        /// <param name="todoItemDTO"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse?> SaveTodoItemAsync(TodoItemDTO todoItemDTO)
+        {
+            RestResponse response;
+            var request = new RestRequest("todo").AddJsonBody(todoItemDTO);
+            try
+            {
+                response = await _client.PostAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"服务器响应异常: {(int)response.StatusCode}",
+                };
+            }
+
+            if (response.Content == null)
+            {
+                return new ApiResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"服务器响应异常: 响应内容为空",
+                };
+            }
+
+            return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
+        }
+
+        /// <summary>
+        /// 获取所有待办事项数据列表
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ApiResponse?> GetTodoItemsAsync()
+        {
+            RestResponse response;
+            var request = new RestRequest("todo");
             try
             {
                 response = await _client.GetAsync(request);

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Text.Json;
-using System.Windows;
-using MyTodo.Core.Api;
+﻿using MyTodo.Core.Api;
 using MyTodo.Core.DTOs;
 using MyTodo.Core.Events;
 using MyTodo.Core.Helpers;
@@ -12,6 +8,11 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Windows;
 
 namespace MyTodo.Modules.Index.ViewModels
 {
@@ -55,11 +56,6 @@ namespace MyTodo.Modules.Index.ViewModels
             _openAddTodoDialogCommand
             ?? (_openAddTodoDialogCommand = new DelegateCommand(ExecuteOpenAddTodoDialogCommand));
 
-        private void ExecuteOpenAddTodoDialogCommand()
-        {
-            _dialogService.ShowDialog(nameof(AddTodoDialog));
-        }
-
         public IndexViewModel(
             ApiClient apiClient,
             IEventAggregator eventAggregator,
@@ -72,7 +68,52 @@ namespace MyTodo.Modules.Index.ViewModels
 
             UpdateWelcomeMessage();
             CreateStatisticPanels();
-            CreateTestData();
+            RefreshTodoItems();
+        }
+
+        /// <summary>
+        /// 打开添加待办事项对话框
+        /// </summary>
+        private void ExecuteOpenAddTodoDialogCommand()
+        {
+            _dialogService.ShowDialog(nameof(AddTodoDialog), AddTodoDialogCallback);
+        }
+
+        /// <summary>
+        /// 待办事项对话框关闭后的回调方法
+        /// </summary>
+        /// <param name="dialogResult"></param>
+        private void AddTodoDialogCallback(IDialogResult dialogResult)
+        {
+            if (dialogResult.Result != ButtonResult.OK)
+                return;
+
+            // 更新统计面板数据
+            RefreshStatisticPanels();
+
+            // 更新待办事项数据
+            RefreshTodoItems();
+        }
+
+        /// <summary>
+        /// 通过api更新待办事项列表数据
+        /// </summary>
+        private async void RefreshTodoItems()
+        {
+            ApiResponse response = await _apiClient.GetTodoItemsAsync();
+
+            if (response.IsSuccess != true)
+            {
+                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("获取待办事项列表数据异常");
+                return;
+            }
+
+            var todoItems = JsonSerializer.Deserialize<List<TodoItem>>(
+                (JsonElement)response.Data,
+                JsonHelper.Options
+            );
+
+            TodoItems = new ObservableCollection<TodoItem>(todoItems);
         }
 
         private void UpdateWelcomeMessage()
@@ -91,33 +132,6 @@ namespace MyTodo.Modules.Index.ViewModels
             string userName = ((UserApiModel)Application.Current.Properties["User"]).Name;
             WelcomeMessage =
                 $"你好, {userName}, 今天是{DateTime.Now.ToString("yyyy-MM-dd")} {weeks[(int)DateTime.Now.DayOfWeek]}";
-        }
-
-        private void CreateTestData()
-        {
-            TodoItems = new ObservableCollection<TodoItem>();
-            MemoItems = new ObservableCollection<MemoItem>();
-
-            for (int i = 0; i < 10; i++)
-            {
-                TodoItems.Add(
-                    new TodoItem()
-                    {
-                        Id = i,
-                        Title = $"待办事项标题{i}",
-                        Content = $"待办内容{i}",
-                    }
-                );
-
-                MemoItems.Add(
-                    new MemoItem()
-                    {
-                        Id = i,
-                        Title = $"备忘录标题{i}",
-                        Content = $"备忘录内容{i}",
-                    }
-                );
-            }
         }
 
         /// <summary>
@@ -165,11 +179,11 @@ namespace MyTodo.Modules.Index.ViewModels
         }
 
         /// <summary>
-        /// 更新统计面板数据
+        /// 通过api更新统计面板数据
         /// </summary>
         private async void RefreshStatisticPanels()
         {
-            ApiResponse response = await _apiClient.GetTodoStatistic();
+            ApiResponse response = await _apiClient.GetTodoStatisticAsync();
 
             if (response.IsSuccess != true)
             {
