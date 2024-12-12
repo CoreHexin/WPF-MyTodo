@@ -7,8 +7,11 @@ using MyTodo.Core.DTOs;
 using MyTodo.Core.Events;
 using MyTodo.Core.Helpers;
 using MyTodo.Core.Models;
+using MyTodo.Modules.Index.Views;
+using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Services.Dialogs;
 
 namespace MyTodo.Modules.Index.ViewModels
 {
@@ -16,6 +19,7 @@ namespace MyTodo.Modules.Index.ViewModels
     {
         private readonly ApiClient _apiClient;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IDialogService _dialogService;
 
         private string _welcomeMessage;
         public string WelcomeMessage
@@ -46,10 +50,25 @@ namespace MyTodo.Modules.Index.ViewModels
             set { SetProperty(ref _memoItems, value); }
         }
 
-        public IndexViewModel(ApiClient apiClient, IEventAggregator eventAggregator)
+        private DelegateCommand _openAddTodoDialogCommand;
+        public DelegateCommand OpenAddTodoDialogCommand =>
+            _openAddTodoDialogCommand
+            ?? (_openAddTodoDialogCommand = new DelegateCommand(ExecuteOpenAddTodoDialogCommand));
+
+        private void ExecuteOpenAddTodoDialogCommand()
+        {
+            _dialogService.ShowDialog(nameof(AddTodoDialog));
+        }
+
+        public IndexViewModel(
+            ApiClient apiClient,
+            IEventAggregator eventAggregator,
+            IDialogService dialogService
+        )
         {
             _apiClient = apiClient;
             _eventAggregator = eventAggregator;
+            _dialogService = dialogService;
 
             UpdateWelcomeMessage();
             CreateStatisticPanels();

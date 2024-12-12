@@ -16,6 +16,8 @@ namespace MyTodo.Modules.Index
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterForNavigation<IndexView, IndexViewModel>();
+
+            containerRegistry.RegisterDialog<AddTodoDialog, AddTodoDialogViewModel>();
         }
     }
 }
