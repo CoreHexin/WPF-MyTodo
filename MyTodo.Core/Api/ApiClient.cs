@@ -30,25 +30,7 @@ namespace MyTodo.Core.Api
                 return new ApiResponse() { IsSuccess = false, Message = ex.Message };
             }
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    Message = $"服务器响应异常: {(int)response.StatusCode}",
-                };
-            }
-
-            if (response.Content == null)
-            {
-                return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    Message = $"服务器响应异常: 响应内容为空",
-                };
-            }
-
-            return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
+            return ParseResponse(response);
         }
 
         public async Task<ApiResponse?> RegisterAsync(RegisterModel registerModel)
@@ -64,25 +46,7 @@ namespace MyTodo.Core.Api
                 return new ApiResponse() { IsSuccess = false, Message = ex.Message };
             }
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    Message = $"服务器响应异常: {(int)response.StatusCode}",
-                };
-            }
-
-            if (response.Content == null)
-            {
-                return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    Message = $"服务器响应异常: 响应内容为空",
-                };
-            }
-
-            return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
+            return ParseResponse(response);
         }
 
         /// <summary>
@@ -102,25 +66,7 @@ namespace MyTodo.Core.Api
                 return new ApiResponse() { IsSuccess = false, Message = ex.Message };
             }
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    Message = $"服务器响应异常: {(int)response.StatusCode}",
-                };
-            }
-
-            if (response.Content == null)
-            {
-                return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    Message = $"服务器响应异常: 响应内容为空",
-                };
-            }
-
-            return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
+            return ParseResponse(response);
         }
 
         /// <summary>
@@ -141,25 +87,7 @@ namespace MyTodo.Core.Api
                 return new ApiResponse() { IsSuccess = false, Message = ex.Message };
             }
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    Message = $"服务器响应异常: {(int)response.StatusCode}",
-                };
-            }
-
-            if (response.Content == null)
-            {
-                return new ApiResponse()
-                {
-                    IsSuccess = false,
-                    Message = $"服务器响应异常: 响应内容为空",
-                };
-            }
-
-            return JsonSerializer.Deserialize<ApiResponse>(response.Content, JsonHelper.Options);
+            return ParseResponse(response);
         }
 
         /// <summary>
@@ -179,6 +107,39 @@ namespace MyTodo.Core.Api
                 return new ApiResponse() { IsSuccess = false, Message = ex.Message };
             }
 
+            return ParseResponse(response);
+        }
+
+        /// <summary>
+        /// 更新待办事项状态
+        /// </summary>
+        /// <param name="todoItem"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse?> UpdateTodoStatusAsync(TodoItem todoItem)
+        {
+            RestResponse response;
+            var request = new RestRequest("todo").AddJsonBody(
+                new { Id = todoItem.Id, Status = todoItem.Status }
+            );
+            try
+            {
+                response = await _client.PutAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+
+            return ParseResponse(response);
+        }
+
+        /// <summary>
+        /// 解析响应
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        private ApiResponse? ParseResponse(RestResponse response)
+        {
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 return new ApiResponse()
