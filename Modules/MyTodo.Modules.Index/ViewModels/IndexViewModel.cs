@@ -30,6 +30,13 @@ namespace MyTodo.Modules.Index.ViewModels
             set { SetProperty(ref _welcomeMessage, value); }
         }
 
+        private bool _isLoading;
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set { SetProperty(ref _isLoading, value); }
+        }
+
         private ObservableCollection<StatisticPanel> _statisticPanels;
         public ObservableCollection<StatisticPanel> StatisticPanels
         {
@@ -66,6 +73,10 @@ namespace MyTodo.Modules.Index.ViewModels
                 )
             );
 
+        private DelegateCommand _loadDataCommand;
+        public DelegateCommand LoadDataCommand =>
+            _loadDataCommand ?? (_loadDataCommand = new DelegateCommand(ExecuteLoadDataCommand));
+
         public IndexViewModel(
             ApiClient apiClient,
             IEventAggregator eventAggregator,
@@ -75,10 +86,19 @@ namespace MyTodo.Modules.Index.ViewModels
             _apiClient = apiClient;
             _eventAggregator = eventAggregator;
             _dialogService = dialogService;
+        }
 
+        /// <summary>
+        /// 加载首页数据
+        /// </summary>
+        private async void ExecuteLoadDataCommand()
+        {
             UpdateWelcomeMessage();
-            CreateStatisticPanelsAsync();
-            RefreshTodoItemsAsync();
+
+            IsLoading = true;
+            await CreateStatisticPanelsAsync();
+            await RefreshTodoItemsAsync();
+            IsLoading = false;
         }
 
         /// <summary>
@@ -87,10 +107,12 @@ namespace MyTodo.Modules.Index.ViewModels
         /// <param name="todoItem"></param>
         private async void ExecuteUpdateTodoStatusCommand(TodoItem todoItem)
         {
+            IsLoading = true;
             ApiResponse response = await _apiClient.UpdateTodoStatusAsync(todoItem);
 
             if (response.IsSuccess != true)
             {
+                IsLoading = false;
                 _eventAggregator
                     .GetEvent<PopupMessageEvent>()
                     .Publish("待办事项状态更新失败, 请稍后重试");
@@ -99,6 +121,7 @@ namespace MyTodo.Modules.Index.ViewModels
 
             await RefreshTodoItemsAsync();
             await RefreshStatisticPanelsAsync();
+            IsLoading = false;
         }
 
         /// <summary>
@@ -118,11 +141,15 @@ namespace MyTodo.Modules.Index.ViewModels
             if (dialogResult.Result != ButtonResult.OK)
                 return;
 
+            IsLoading = true;
+
             // 更新统计面板数据
             await RefreshStatisticPanelsAsync();
 
             // 更新待办事项数据
             await RefreshTodoItemsAsync();
+
+            IsLoading = false;
         }
 
         /// <summary>
