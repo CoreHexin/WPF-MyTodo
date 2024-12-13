@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyTodo.WebServer.Data;
@@ -55,16 +54,22 @@ namespace MyTodo.WebServer.Controllers
             var response = new ApiResponse();
 
             var now = DateTime.Now;
-            var newTodo = new Todo()
-            {
-                Title = todoItemDTO.Title,
-                Content = todoItemDTO.Content,
-                Status = todoItemDTO.Status,
-                CreatedAt = now,
-                UpdatedAt = now,
-            };
+            Todo newTodo = _mapper.Map<Todo>(todoItemDTO);
+            newTodo.CreatedAt = now;
+            newTodo.UpdatedAt = now;
+
             _appDbContext.Todos.Add(newTodo);
-            await _appDbContext.SaveChangesAsync();
+
+            try
+            {
+                await _appDbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "服务器异常，请稍后重试";
+                return BadRequest(response);
+            }
 
             response.IsSuccess = true;
             response.Data = newTodo;
@@ -75,11 +80,21 @@ namespace MyTodo.WebServer.Controllers
         public async Task<IActionResult> GetTodoItemsAsync()
         {
             var response = new ApiResponse();
+            List<Todo> todoItems;
 
-            var todoItems = await _appDbContext
-                .Todos.OrderBy(t => t.Status)
-                .ThenByDescending(t => t.CreatedAt)
-                .ToListAsync();
+            try
+            {
+                todoItems = await _appDbContext
+                    .Todos.OrderBy(t => t.Status)
+                    .ThenByDescending(t => t.CreatedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "服务器异常，请稍后重试";
+                return BadRequest(response);
+            }
 
             response.IsSuccess = true;
             response.Data = todoItems;
@@ -87,21 +102,30 @@ namespace MyTodo.WebServer.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateTodoItemStatusAsync(TodoItemStatusUpdateDTO todoItemDTO)
+        public async Task<IActionResult> UpdateTodoItemStatusAsync(
+            TodoItemStatusUpdateDTO todoItemDTO
+        )
         {
             var response = new ApiResponse();
 
-            var todoItem = await _appDbContext.Todos.FindAsync(todoItemDTO.Id);
-            if (todoItem == null)
+            try
             {
-                return NotFound();
+                var todoItem = await _appDbContext.Todos.FindAsync(todoItemDTO.Id);
+                if (todoItem == null)
+                {
+                    return NotFound();
+                }
+                todoItem.Status = todoItemDTO.Status;
+                await _appDbContext.SaveChangesAsync();
+                response.IsSuccess = true;
+                return Ok(response);
             }
-
-            todoItem.Status = todoItemDTO.Status;
-            await _appDbContext.SaveChangesAsync();
-
-            response.IsSuccess = true;
-            return Ok(response);
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "服务器异常，请稍后重试";
+                return BadRequest(response);
+            }
         }
     }
 }
