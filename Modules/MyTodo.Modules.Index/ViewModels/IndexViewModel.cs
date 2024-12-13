@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using MyTodo.Core.Api;
 using MyTodo.Core.DTOs;
@@ -76,8 +77,8 @@ namespace MyTodo.Modules.Index.ViewModels
             _dialogService = dialogService;
 
             UpdateWelcomeMessage();
-            CreateStatisticPanels();
-            RefreshTodoItems();
+            CreateStatisticPanelsAsync();
+            RefreshTodoItemsAsync();
         }
 
         /// <summary>
@@ -96,8 +97,8 @@ namespace MyTodo.Modules.Index.ViewModels
                 return;
             }
 
-            RefreshTodoItems();
-            RefreshStatisticPanels();
+            await RefreshTodoItemsAsync();
+            await RefreshStatisticPanelsAsync();
         }
 
         /// <summary>
@@ -112,22 +113,22 @@ namespace MyTodo.Modules.Index.ViewModels
         /// 待办事项对话框关闭后的回调方法
         /// </summary>
         /// <param name="dialogResult"></param>
-        private void AddTodoDialogCallback(IDialogResult dialogResult)
+        private async void AddTodoDialogCallback(IDialogResult dialogResult)
         {
             if (dialogResult.Result != ButtonResult.OK)
                 return;
 
             // 更新统计面板数据
-            RefreshStatisticPanels();
+            await RefreshStatisticPanelsAsync();
 
             // 更新待办事项数据
-            RefreshTodoItems();
+            await RefreshTodoItemsAsync();
         }
 
         /// <summary>
         /// 通过api更新待办事项列表数据
         /// </summary>
-        private async void RefreshTodoItems()
+        private async Task RefreshTodoItemsAsync()
         {
             ApiResponse response = await _apiClient.GetTodoItemsAsync();
 
@@ -166,7 +167,7 @@ namespace MyTodo.Modules.Index.ViewModels
         /// <summary>
         /// 创建统计面板
         /// </summary>
-        private void CreateStatisticPanels()
+        private async Task CreateStatisticPanelsAsync()
         {
             StatisticPanels = new ObservableCollection<StatisticPanel>()
             {
@@ -204,13 +205,13 @@ namespace MyTodo.Modules.Index.ViewModels
                 },
             };
 
-            RefreshStatisticPanels();
+            await RefreshStatisticPanelsAsync();
         }
 
         /// <summary>
         /// 通过api更新统计面板数据
         /// </summary>
-        private async void RefreshStatisticPanels()
+        private async Task RefreshStatisticPanelsAsync()
         {
             ApiResponse response = await _apiClient.GetTodoStatisticAsync();
 

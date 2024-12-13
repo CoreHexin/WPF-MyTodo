@@ -66,7 +66,6 @@ namespace MyTodo.WebServer.Controllers
             _appDbContext.Todos.Add(newTodo);
             await _appDbContext.SaveChangesAsync();
 
-            await Task.Delay(2000);
             response.IsSuccess = true;
             response.Data = newTodo;
             return Ok(response);
