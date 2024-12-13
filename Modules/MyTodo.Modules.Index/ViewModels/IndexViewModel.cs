@@ -1,4 +1,9 @@
-﻿using MyTodo.Core.Api;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Windows;
+using MyTodo.Core.Api;
 using MyTodo.Core.DTOs;
 using MyTodo.Core.Events;
 using MyTodo.Core.Helpers;
@@ -8,11 +13,6 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text.Json;
-using System.Windows;
 
 namespace MyTodo.Modules.Index.ViewModels
 {
@@ -56,6 +56,15 @@ namespace MyTodo.Modules.Index.ViewModels
             _openAddTodoDialogCommand
             ?? (_openAddTodoDialogCommand = new DelegateCommand(ExecuteOpenAddTodoDialogCommand));
 
+        private DelegateCommand<TodoItem> _updateTodoStatusCommand;
+        public DelegateCommand<TodoItem> UpdateTodoStatusCommand =>
+            _updateTodoStatusCommand
+            ?? (
+                _updateTodoStatusCommand = new DelegateCommand<TodoItem>(
+                    ExecuteUpdateTodoStatusCommand
+                )
+            );
+
         public IndexViewModel(
             ApiClient apiClient,
             IEventAggregator eventAggregator,
@@ -69,6 +78,26 @@ namespace MyTodo.Modules.Index.ViewModels
             UpdateWelcomeMessage();
             CreateStatisticPanels();
             RefreshTodoItems();
+        }
+
+        /// <summary>
+        /// 更新待办事项状态
+        /// </summary>
+        /// <param name="todoItem"></param>
+        private async void ExecuteUpdateTodoStatusCommand(TodoItem todoItem)
+        {
+            ApiResponse response = await _apiClient.UpdateTodoStatusAsync(todoItem);
+
+            if (response.IsSuccess != true)
+            {
+                _eventAggregator
+                    .GetEvent<PopupMessageEvent>()
+                    .Publish("待办事项状态更新失败, 请稍后重试");
+                return;
+            }
+
+            RefreshTodoItems();
+            RefreshStatisticPanels();
         }
 
         /// <summary>

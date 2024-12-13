@@ -13,7 +13,9 @@ namespace MyTodo.Core.Converters
 
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            if ((bool)value)
+                return 1;
+            return 0;
         }
     }
 }

@@ -88,6 +88,8 @@
                                     </StackPanel>
                                     <ToggleButton
                                         HorizontalAlignment="Right"
+                                        Command="{Binding DataContext.UpdateTodoStatusCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
                                         IsChecked="{Binding Status, Converter={converters:IntToBoolConverter}}"
                                         Style="{StaticResource MaterialDesignSwitchSecondaryToggleButton}" />
                                 </Grid>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using MyTodo.Core.Api;
 using MyTodo.Core.DTOs;
 using MyTodo.Core.Events;
@@ -66,15 +65,17 @@ namespace MyTodo.Modules.Index.ViewModels
         /// <summary>
         /// 通过API保存待办事项数据
         /// </summary>
-        private async void ExecuteSaveCommand() 
-        { 
+        private async void ExecuteSaveCommand()
+        {
             IsLoading = true;
             var response = await _apiClient.SaveTodoItemAsync(TodoItemDTO);
             IsLoading = false;
 
             if (!response.IsSuccess)
             {
-                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("创建待办事项失败, 请稍后重试");
+                _eventAggregator
+                    .GetEvent<PopupMessageEvent>()
+                    .Publish("创建待办事项失败, 请稍后重试");
                 return;
             }
 
