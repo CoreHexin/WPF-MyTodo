@@ -86,5 +86,23 @@ namespace MyTodo.WebServer.Controllers
             response.Data = todoItems;
             return Ok(response);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateTodoItemStatusAsync(TodoItemStatusUpdateDTO todoItemDTO)
+        {
+            var response = new ApiResponse();
+
+            var todoItem = await _appDbContext.Todos.FindAsync(todoItemDTO.Id);
+            if (todoItem == null)
+            {
+                return NotFound();
+            }
+
+            todoItem.Status = todoItemDTO.Status;
+            await _appDbContext.SaveChangesAsync();
+
+            response.IsSuccess = true;
+            return Ok(response);
+        }
     }
 }
