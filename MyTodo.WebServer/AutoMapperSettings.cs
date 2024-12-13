@@ -12,7 +12,7 @@ namespace MyTodo.WebServer
             CreateMap<User, NewUserDTO>();
             CreateMap<RegisterDTO, NewUserDTO>();
 
-            CreateMap<TodoItemDTO, Todo>();
+            CreateMap<TodoDTO, Todo>();
         }
     }
 }

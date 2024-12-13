@@ -49,12 +49,12 @@ namespace MyTodo.WebServer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveTodoItemAsync(TodoItemDTO todoItemDTO)
+        public async Task<IActionResult> SaveTodoAsync(TodoDTO todoDTO)
         {
             var response = new ApiResponse();
 
             var now = DateTime.Now;
-            Todo newTodo = _mapper.Map<Todo>(todoItemDTO);
+            Todo newTodo = _mapper.Map<Todo>(todoDTO);
             newTodo.CreatedAt = now;
             newTodo.UpdatedAt = now;
 
@@ -77,7 +77,7 @@ namespace MyTodo.WebServer.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTodoItemsAsync()
+        public async Task<IActionResult> GetTodosAsync()
         {
             var response = new ApiResponse();
             List<Todo> todoItems;
@@ -101,22 +101,52 @@ namespace MyTodo.WebServer.Controllers
             return Ok(response);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateTodoItemStatusAsync(
-            TodoItemStatusUpdateDTO todoItemDTO
+        [HttpPut("status")]
+        public async Task<IActionResult> UpdateTodoStatusAsync(
+            TodoStatusUpdateDTO todoDTO
         )
         {
             var response = new ApiResponse();
 
             try
             {
-                var todoItem = await _appDbContext.Todos.FindAsync(todoItemDTO.Id);
+                var todoItem = await _appDbContext.Todos.FindAsync(todoDTO.Id);
                 if (todoItem == null)
                 {
                     return NotFound();
                 }
-                todoItem.Status = todoItemDTO.Status;
+                todoItem.Status = todoDTO.Status;
                 await _appDbContext.SaveChangesAsync();
+                response.IsSuccess = true;
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "服务器异常，请稍后重试";
+                return BadRequest(response);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateTodo(TodoDTO todoDTO)
+        {
+            var response = new ApiResponse();
+
+            try
+            {
+                Todo? todoItem = await _appDbContext.Todos.FindAsync(todoDTO.Id);
+                if (todoItem == null)
+                {
+                    return NotFound();
+                }
+
+                todoItem.Title = todoDTO.Title;
+                todoItem.Content = todoDTO.Content;
+                todoItem.Status = todoDTO.Status;
+                todoItem.UpdatedAt = DateTime.Now;
+                await _appDbContext.SaveChangesAsync();
+
                 response.IsSuccess = true;
                 return Ok(response);
             }
