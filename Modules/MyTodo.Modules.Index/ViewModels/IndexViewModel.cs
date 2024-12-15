@@ -177,7 +177,7 @@ namespace MyTodo.Modules.Index.ViewModels
         /// </summary>
         private void ExecuteOpenAddTodoDialogCommand()
         {
-            _dialogService.ShowDialog(nameof(AddTodoDialog), AddTodoDialogCallback);
+            _dialogService.ShowDialog(nameof(CreateTodoDialog), AddTodoDialogCallback);
         }
 
         /// <summary>

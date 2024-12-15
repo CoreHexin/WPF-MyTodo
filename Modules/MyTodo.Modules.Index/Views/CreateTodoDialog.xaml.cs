@@ -5,9 +5,9 @@ namespace MyTodo.Modules.Index.Views
     /// <summary>
     /// Interaction logic for AddTodoDialog
     /// </summary>
-    public partial class AddTodoDialog : UserControl
+    public partial class CreateTodoDialog : UserControl
     {
-        public AddTodoDialog()
+        public CreateTodoDialog()
         {
             InitializeComponent();
         }

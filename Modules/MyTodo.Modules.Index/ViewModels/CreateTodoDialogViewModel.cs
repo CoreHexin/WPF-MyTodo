@@ -10,7 +10,7 @@ using Prism.Services.Dialogs;
 
 namespace MyTodo.Modules.Index.ViewModels
 {
-    public class AddTodoDialogViewModel : BindableBase, IDialogAware
+    public class CreateTodoDialogViewModel : BindableBase, IDialogAware
     {
         private readonly ApiClient _apiClient;
         private readonly IEventAggregator _eventAggregator;
@@ -47,7 +47,7 @@ namespace MyTodo.Modules.Index.ViewModels
                     .ObservesProperty(() => TodoForCreateDTO.Content)
             );
 
-        public AddTodoDialogViewModel(ApiClient apiClient, IEventAggregator eventAggregator)
+        public CreateTodoDialogViewModel(ApiClient apiClient, IEventAggregator eventAggregator)
         {
             _apiClient = apiClient;
             _eventAggregator = eventAggregator;
