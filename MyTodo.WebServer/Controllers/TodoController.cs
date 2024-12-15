@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyTodo.WebServer.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using MyTodo.WebServer.DTOs.Todo;
 using MyTodo.WebServer.Models;
+using MyTodo.WebServer.Repositories;
 
 namespace MyTodo.WebServer.Controllers
 {
@@ -11,151 +9,61 @@ namespace MyTodo.WebServer.Controllers
     [ApiController]
     public class TodoController : ControllerBase
     {
-        private readonly AppDbContext _appDbContext;
-        private readonly IMapper _mapper;
+        private readonly ITodoRepository _todoRepository;
 
-        public TodoController(AppDbContext appDbContext, IMapper mapper)
+        public TodoController(ITodoRepository todoRepository)
         {
-            _appDbContext = appDbContext;
-            _mapper = mapper;
+            _todoRepository = todoRepository;
         }
 
         [HttpGet("statistic")]
-        public async Task<IActionResult> GetStatisticAsync()
+        public async Task<IActionResult> GetStatistic()
         {
             var response = new ApiResponse();
-            int totalCount;
-            int finishedCount;
-
-            try
-            {
-                totalCount = await _appDbContext.Todos.CountAsync();
-                finishedCount = await _appDbContext.Todos.Where(t => t.Status == 1).CountAsync();
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = "服务器异常，请稍后重试";
-                return BadRequest(response);
-            }
-
+            StatisticDTO statisticDTO = await _todoRepository.GetStatisticAsync();
             response.IsSuccess = true;
-            response.Data = new StatisticDTO()
-            {
-                TotalCount = totalCount,
-                FinishedCount = finishedCount,
-            };
+            response.Data = statisticDTO;
             return Ok(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveTodoAsync(TodoDTO todoDTO)
+        public async Task<IActionResult> Create([FromBody] TodoForCreateDTO todoForCreateDTO)
         {
             var response = new ApiResponse();
-
-            var now = DateTime.Now;
-            Todo newTodo = _mapper.Map<Todo>(todoDTO);
-            newTodo.CreatedAt = now;
-            newTodo.UpdatedAt = now;
-
-            _appDbContext.Todos.Add(newTodo);
-
-            try
-            {
-                await _appDbContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
+            Todo? todo = await _todoRepository.CreateAsync(todoForCreateDTO);
+            if (todo == null)
             {
                 response.IsSuccess = false;
-                response.Message = "服务器异常，请稍后重试";
+                response.Message = "创建数据失败";
                 return BadRequest(response);
             }
-
             response.IsSuccess = true;
-            response.Data = newTodo;
+            response.Data = todo;
             return Ok(response);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTodosAsync()
+        public async Task<IActionResult> GetAll()
         {
             var response = new ApiResponse();
-            List<Todo> todoItems;
-
-            try
-            {
-                todoItems = await _appDbContext
-                    .Todos.OrderBy(t => t.Status)
-                    .ThenByDescending(t => t.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = "服务器异常，请稍后重试";
-                return BadRequest(response);
-            }
-
+            List<Todo> todos = await _todoRepository.GetAllAsync();
             response.IsSuccess = true;
-            response.Data = todoItems;
+            response.Data = todos;
             return Ok(response);
         }
 
-        [HttpPut("status")]
-        public async Task<IActionResult> UpdateTodoStatusAsync(
-            TodoStatusUpdateDTO todoDTO
-        )
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute]int id, [FromBody]TodoForUpdateDTO todoForUpdateDTO)
         {
             var response = new ApiResponse();
-
-            try
+            Todo? todo = await _todoRepository.UpdateAsync(id, todoForUpdateDTO);
+            if (todo == null)
             {
-                var todoItem = await _appDbContext.Todos.FindAsync(todoDTO.Id);
-                if (todoItem == null)
-                {
-                    return NotFound();
-                }
-                todoItem.Status = todoDTO.Status;
-                await _appDbContext.SaveChangesAsync();
-                response.IsSuccess = true;
-                return Ok(response);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = "服务器异常，请稍后重试";
-                return BadRequest(response);
-            }
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> UpdateTodo(TodoDTO todoDTO)
-        {
-            var response = new ApiResponse();
-
-            try
-            {
-                Todo? todoItem = await _appDbContext.Todos.FindAsync(todoDTO.Id);
-                if (todoItem == null)
-                {
-                    return NotFound();
-                }
-
-                todoItem.Title = todoDTO.Title;
-                todoItem.Content = todoDTO.Content;
-                todoItem.Status = todoDTO.Status;
-                todoItem.UpdatedAt = DateTime.Now;
-                await _appDbContext.SaveChangesAsync();
-
-                response.IsSuccess = true;
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = "服务器异常，请稍后重试";
-                return BadRequest(response);
-            }
+            response.IsSuccess = true;
+            response.Data = todo;
+            return Ok(response);
         }
     }
 }

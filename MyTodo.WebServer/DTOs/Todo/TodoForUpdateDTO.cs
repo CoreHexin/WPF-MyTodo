@@ -1,9 +1,7 @@
 ﻿namespace MyTodo.WebServer.DTOs.Todo
 {
-    public record TodoDTO
+    public record TodoForUpdateDTO
     {
-        public int Id { get; set; }
-
         public string Title { get; set; }
 
         public string Content { get; set; }

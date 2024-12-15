@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyTodo.WebServer;
 using MyTodo.WebServer.Data;
+using MyTodo.WebServer.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddAutoMapper(typeof(AutoMapperSettings));
+
+builder.Services.AddScoped<ITodoRepository, TodoRepository>();
+
 
 var app = builder.Build();
 
