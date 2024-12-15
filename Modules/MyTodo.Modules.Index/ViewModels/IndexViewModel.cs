@@ -59,10 +59,10 @@ namespace MyTodo.Modules.Index.ViewModels
             set { SetProperty(ref _memoItems, value); }
         }
 
-        private DelegateCommand _openAddTodoDialogCommand;
-        public DelegateCommand OpenAddTodoDialogCommand =>
-            _openAddTodoDialogCommand
-            ?? (_openAddTodoDialogCommand = new DelegateCommand(ExecuteOpenAddTodoDialogCommand));
+        private DelegateCommand _showCreateTodoDialogCommand;
+        public DelegateCommand ShowCreateTodoDialogCommand =>
+            _showCreateTodoDialogCommand
+            ?? (_showCreateTodoDialogCommand = new DelegateCommand(ExecuteShowCreateTodoDialogCommand));
 
         private DelegateCommand<TodoItem> _updateTodoStatusCommand;
         public DelegateCommand<TodoItem> UpdateTodoStatusCommand =>
@@ -77,18 +77,18 @@ namespace MyTodo.Modules.Index.ViewModels
         public DelegateCommand LoadDataCommand =>
             _loadDataCommand ?? (_loadDataCommand = new DelegateCommand(ExecuteLoadDataCommand));
 
-        private DelegateCommand<TodoItem> _updateTodoCommand;
-        public DelegateCommand<TodoItem> UpdateTodoCommand =>
-            _updateTodoCommand
+        private DelegateCommand<TodoItem> _showUpdateTodoDialogCommand;
+        public DelegateCommand<TodoItem> ShowUpdateTodoDialogCommand =>
+            _showUpdateTodoDialogCommand
             ?? (
-                _updateTodoCommand = new DelegateCommand<TodoItem>(ExecuteUpdateTodoCommand)
+                _showUpdateTodoDialogCommand = new DelegateCommand<TodoItem>(ExecuteShowUpdateTodoDialogCommand)
             );
 
         /// <summary>
         /// 弹出修改TodoItem对话框
         /// </summary>
         /// <param name="todoItem"></param>
-        public void ExecuteUpdateTodoCommand(TodoItem todoItem)
+        public void ExecuteShowUpdateTodoDialogCommand(TodoItem todoItem)
         {
             DialogParameters dialogParameters = new DialogParameters();
             dialogParameters.Add("TodoItem", todoItem);
@@ -175,16 +175,16 @@ namespace MyTodo.Modules.Index.ViewModels
         /// <summary>
         /// 打开添加待办事项对话框
         /// </summary>
-        private void ExecuteOpenAddTodoDialogCommand()
+        private void ExecuteShowCreateTodoDialogCommand()
         {
-            _dialogService.ShowDialog(nameof(CreateTodoDialog), AddTodoDialogCallback);
+            _dialogService.ShowDialog(nameof(CreateTodoDialog), CreateTodoDialogCallback);
         }
 
         /// <summary>
         /// 待办事项对话框关闭后的回调方法
         /// </summary>
         /// <param name="dialogResult"></param>
-        private async void AddTodoDialogCallback(IDialogResult dialogResult)
+        private async void CreateTodoDialogCallback(IDialogResult dialogResult)
         {
             if (dialogResult.Result != ButtonResult.OK)
                 return;

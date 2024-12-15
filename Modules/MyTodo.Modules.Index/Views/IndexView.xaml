@@ -88,7 +88,7 @@
                         Height="30"
                         Margin="20,10"
                         HorizontalAlignment="Right"
-                        Command="{Binding OpenAddTodoDialogCommand}"
+                        Command="{Binding ShowCreateTodoDialogCommand}"
                         Content="{materialDesign:PackIcon Kind=Add,
                                                           Size=24}"
                         Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryDarkButton}" />
@@ -101,7 +101,7 @@
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseDoubleClick">
-                                <i:InvokeCommandAction Command="{Binding UpdateTodoCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                                <i:InvokeCommandAction Command="{Binding ShowUpdateTodoDialogCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
 
