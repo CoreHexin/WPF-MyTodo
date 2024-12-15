@@ -1,9 +1,9 @@
-﻿using MyTodo.Core.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using MyTodo.Core.Models;
 
 namespace MyTodo.Core.DTOs
 {
-    public class TodoItemDTO : NotifyDataErrorInfo
+    public class TodoForCreateDTO : NotifyDataErrorInfo
     {
         private string _title = string.Empty;
 
@@ -11,8 +11,8 @@ namespace MyTodo.Core.DTOs
         public string Title
         {
             get { return _title; }
-            set 
-            { 
+            set
+            {
                 if (SetProperty(ref _title, value))
                 {
                     Validate(nameof(Title), value);
@@ -35,6 +35,11 @@ namespace MyTodo.Core.DTOs
             }
         }
 
-        public int Status { get; set; }
+        private int _status;
+        public int Status
+        {
+            get { return _status; }
+            set { SetProperty(ref _status, value); }
+        }
     }
 }

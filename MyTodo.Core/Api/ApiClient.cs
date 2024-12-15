@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text.Json;
+﻿using System.Text.Json;
 using MyTodo.Core.DTOs;
 using MyTodo.Core.Helpers;
 using MyTodo.Core.Models;
@@ -72,12 +71,12 @@ namespace MyTodo.Core.Api
         /// <summary>
         /// 保存待办事项数据
         /// </summary>
-        /// <param name="todoItemDTO"></param>
+        /// <param name="todoForCreateDTO"></param>
         /// <returns></returns>
-        public async Task<ApiResponse?> SaveTodoItemAsync(TodoItemDTO todoItemDTO)
+        public async Task<ApiResponse?> CreateTodoAsync(TodoForCreateDTO todoForCreateDTO)
         {
             RestResponse response;
-            var request = new RestRequest("todo").AddJsonBody(todoItemDTO);
+            var request = new RestRequest("todo").AddJsonBody(todoForCreateDTO);
             try
             {
                 response = await _client.PostAsync(request);
@@ -94,7 +93,7 @@ namespace MyTodo.Core.Api
         /// 获取所有待办事项数据列表
         /// </summary>
         /// <returns></returns>
-        public async Task<ApiResponse?> GetTodoItemsAsync()
+        public async Task<ApiResponse?> GetTodosAsync()
         {
             RestResponse response;
             var request = new RestRequest("todo");
@@ -111,16 +110,14 @@ namespace MyTodo.Core.Api
         }
 
         /// <summary>
-        /// 更新待办事项状态
+        /// 更新待办事项
         /// </summary>
-        /// <param name="todoItem"></param>
+        /// <param name="todoForUpdateDTO"></param>
         /// <returns></returns>
-        public async Task<ApiResponse?> UpdateTodoStatusAsync(TodoItem todoItem)
+        public async Task<ApiResponse?> UpdateTodoAsync(int id, TodoForUpdateDTO todoForUpdateDTO)
         {
             RestResponse response;
-            var request = new RestRequest("todo").AddJsonBody(
-                new { Id = todoItem.Id, Status = todoItem.Status }
-            );
+            var request = new RestRequest($"todo/{id}").AddJsonBody(todoForUpdateDTO);
             try
             {
                 response = await _client.PutAsync(request);
@@ -140,7 +137,7 @@ namespace MyTodo.Core.Api
         /// <returns></returns>
         private ApiResponse? ParseResponse(RestResponse response)
         {
-            if (response.StatusCode != HttpStatusCode.OK)
+            if ((int)response.StatusCode >= 400)
             {
                 return new ApiResponse()
                 {

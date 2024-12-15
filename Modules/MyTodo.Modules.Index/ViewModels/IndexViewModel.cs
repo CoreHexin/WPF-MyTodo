@@ -77,6 +77,47 @@ namespace MyTodo.Modules.Index.ViewModels
         public DelegateCommand LoadDataCommand =>
             _loadDataCommand ?? (_loadDataCommand = new DelegateCommand(ExecuteLoadDataCommand));
 
+        private DelegateCommand<TodoItem> _updateTodoCommand;
+        public DelegateCommand<TodoItem> UpdateTodoCommand =>
+            _updateTodoCommand
+            ?? (
+                _updateTodoCommand = new DelegateCommand<TodoItem>(ExecuteUpdateTodoCommand)
+            );
+
+        /// <summary>
+        /// 弹出修改TodoItem对话框
+        /// </summary>
+        /// <param name="todoItem"></param>
+        public void ExecuteUpdateTodoCommand(TodoItem todoItem)
+        {
+            DialogParameters dialogParameters = new DialogParameters();
+            dialogParameters.Add("TodoItem", todoItem);
+
+            _dialogService.ShowDialog(
+                nameof(UpdateTodoDialog),
+                dialogParameters,
+                UpdateTodoDialogCallback
+            );
+        }
+
+        private async void UpdateTodoDialogCallback(IDialogResult dialogResult)
+        {
+            if (dialogResult.Result != ButtonResult.OK)
+            {
+                return;
+            }
+
+            IsLoading = true;
+
+            // 更新统计面板数据
+            await RefreshStatisticPanelsAsync();
+
+            // 更新待办事项数据
+            await RefreshTodoItemsAsync();
+
+            IsLoading = false;
+        }
+
         public IndexViewModel(
             ApiClient apiClient,
             IEventAggregator eventAggregator,
@@ -107,8 +148,15 @@ namespace MyTodo.Modules.Index.ViewModels
         /// <param name="todoItem"></param>
         private async void ExecuteUpdateTodoStatusCommand(TodoItem todoItem)
         {
+            TodoForUpdateDTO todoForUpdateDTO = new TodoForUpdateDTO()
+            {
+                Title = todoItem.Title,
+                Content = todoItem.Content,
+                Status = todoItem.Status,
+            };
+
             IsLoading = true;
-            ApiResponse response = await _apiClient.UpdateTodoStatusAsync(todoItem);
+            ApiResponse response = await _apiClient.UpdateTodoAsync(todoItem.Id, todoForUpdateDTO);
 
             if (response.IsSuccess != true)
             {
@@ -157,7 +205,7 @@ namespace MyTodo.Modules.Index.ViewModels
         /// </summary>
         private async Task RefreshTodoItemsAsync()
         {
-            ApiResponse response = await _apiClient.GetTodoItemsAsync();
+            ApiResponse response = await _apiClient.GetTodosAsync();
 
             if (response.IsSuccess != true)
             {

@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="MyTodo.Modules.Index.Views.AddTodoDialog"
+    x:Class="MyTodo.Modules.Index.Views.UpdateTodoDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -41,7 +41,7 @@
         <TextBlock
             Grid.Row="0"
             FontSize="30"
-            Text="添加待办" />
+            Text="编辑待办" />
         <StackPanel
             Grid.Row="1"
             Margin="0,10"
@@ -50,7 +50,7 @@
                 Margin="0,0,10,0"
                 VerticalAlignment="Center"
                 Text="状态:" />
-            <ComboBox SelectedIndex="{Binding TodoForCreateDTO.Status}">
+            <ComboBox SelectedIndex="{Binding TodoForUpdateDTO.Status}">
                 <ComboBoxItem>待办</ComboBoxItem>
                 <ComboBoxItem>已完成</ComboBoxItem>
             </ComboBox>
@@ -58,14 +58,14 @@
         <TextBox
             Grid.Row="2"
             materialDesign:HintAssist.Hint="请输入待办标题"
-            Text="{Binding TodoForCreateDTO.Title, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding TodoForUpdateDTO.Title, UpdateSourceTrigger=PropertyChanged}" />
         <TextBox
             Grid.Row="3"
             Margin="0,20"
             VerticalContentAlignment="Top"
             materialDesign:HintAssist.Hint="请输入待办内容"
             AcceptsReturn="True"
-            Text="{Binding TodoForCreateDTO.Content, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding TodoForUpdateDTO.Content, UpdateSourceTrigger=PropertyChanged}"
             TextWrapping="Wrap" />
         <StackPanel
             Grid.Row="4"

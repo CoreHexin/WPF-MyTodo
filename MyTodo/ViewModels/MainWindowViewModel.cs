@@ -12,6 +12,8 @@ namespace MyTodo.ViewModels
         private readonly IRegionManager _regionManager;
         private IRegionNavigationJournal _regionNavigationJournal;
 
+        public string Title => "My To Do";
+
         public List<LeftMenuItem> LeftMenuItems { get; set; }
 
         private LeftMenuItem _selectedMenu;

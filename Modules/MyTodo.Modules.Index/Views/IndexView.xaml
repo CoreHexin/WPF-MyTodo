@@ -98,6 +98,13 @@
                         HorizontalContentAlignment="Stretch"
                         ItemsSource="{Binding TodoItems}"
                         ScrollViewer.VerticalScrollBarVisibility="Hidden">
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding UpdateTodoCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="10,0">

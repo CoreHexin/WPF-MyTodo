@@ -26,11 +26,11 @@ namespace MyTodo.Modules.Index.ViewModels
             set { SetProperty(ref _isLoading, value); }
         }
 
-        private TodoItemDTO _todoItemDTO = new TodoItemDTO();
-        public TodoItemDTO TodoItemDTO
+        private TodoForCreateDTO _todoForCreateDTO = new TodoForCreateDTO();
+        public TodoForCreateDTO TodoForCreateDTO
         {
-            get { return _todoItemDTO; }
-            set { SetProperty(ref _todoItemDTO, value); }
+            get { return _todoForCreateDTO; }
+            set { SetProperty(ref _todoForCreateDTO, value); }
         }
 
         private DelegateCommand _cancelCommand;
@@ -43,8 +43,8 @@ namespace MyTodo.Modules.Index.ViewModels
             _saveCommand
             ?? (
                 _saveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand)
-                    .ObservesProperty(() => TodoItemDTO.Title)
-                    .ObservesProperty(() => TodoItemDTO.Content)
+                    .ObservesProperty(() => TodoForCreateDTO.Title)
+                    .ObservesProperty(() => TodoForCreateDTO.Content)
             );
 
         public AddTodoDialogViewModel(ApiClient apiClient, IEventAggregator eventAggregator)
@@ -56,8 +56,8 @@ namespace MyTodo.Modules.Index.ViewModels
         private bool CanExecuteSaveCommand()
         {
             return Validator.TryValidateObject(
-                TodoItemDTO,
-                new ValidationContext(TodoItemDTO),
+                TodoForCreateDTO,
+                new ValidationContext(TodoForCreateDTO),
                 null
             );
         }
@@ -68,7 +68,7 @@ namespace MyTodo.Modules.Index.ViewModels
         private async void ExecuteSaveCommand()
         {
             IsLoading = true;
-            var response = await _apiClient.SaveTodoItemAsync(TodoItemDTO);
+            var response = await _apiClient.CreateTodoAsync(TodoForCreateDTO);
             IsLoading = false;
 
             if (!response.IsSuccess)
