@@ -93,10 +93,20 @@ namespace MyTodo.Core.Api
         /// 获取所有待办事项数据列表
         /// </summary>
         /// <returns></returns>
-        public async Task<ApiResponse?> GetTodosAsync()
+        public async Task<ApiResponse?> GetTodosAsync(TodoQueryObject? queryObject = null)
         {
             RestResponse response;
-            var request = new RestRequest("todo");
+            RestRequest request;
+            if (queryObject == null)
+            {
+                request = new RestRequest($"todo");
+            }
+            else
+            {
+                request = new RestRequest(
+                    $"todo?title={queryObject.Title}&status={queryObject.Status}"
+                );
+            }
             try
             {
                 response = await _client.GetAsync(request);

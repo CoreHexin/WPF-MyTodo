@@ -75,16 +75,26 @@
                             VerticalAlignment="Center"
                             materialDesign:HintAssist.Hint="查找待办事项..."
                             materialDesign:TextFieldAssist.HasClearButton="True"
-                            FontSize="16" />
+                            FontSize="16"
+                            Text="{Binding SearchTitle, UpdateSourceTrigger=PropertyChanged, Delay=350}">
+                        </TextBox>
+                        
                         <TextBlock
                             Margin="20,0,10,0"
                             VerticalAlignment="Center"
                             FontSize="16"
                             Text="筛选:" />
-                        <ComboBox FontSize="15" SelectedIndex="0">
-                            <ComboBoxItem>全部</ComboBoxItem>
-                            <ComboBoxItem>待办</ComboBoxItem>
-                            <ComboBoxItem>已完成</ComboBoxItem>
+                        <ComboBox
+                            DisplayMemberPath="Name"
+                            FontSize="15"
+                            ItemsSource="{Binding TodoStatuses}"
+                            SelectedIndex="0"
+                            SelectedItem="{Binding SearchStatus}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding SearchCommand}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
                         </ComboBox>
                     </StackPanel>
 

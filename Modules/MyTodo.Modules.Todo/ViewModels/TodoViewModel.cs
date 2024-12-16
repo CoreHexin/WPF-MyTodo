@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
@@ -18,6 +19,28 @@ namespace MyTodo.Modules.Todo.ViewModels
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly ApiClient _apiClient;
+
+        public List<TodoStatus> TodoStatuses { get; set; }
+
+        public TodoStatus SearchStatus { get; set; }
+
+        private string _searchTitle;
+
+        public string SearchTitle 
+        {
+            get
+            {
+                return _searchTitle;
+            }
+            set
+            {
+                if (_searchTitle != value)
+                {
+                    _searchTitle = value;
+                    ExecuteSearchCommand();
+                }
+            }
+        }
 
         private bool _isLoading;
         public bool IsLoading
@@ -79,6 +102,35 @@ namespace MyTodo.Modules.Todo.ViewModels
                     .ObservesProperty(() => TodoForCreateDTO.Content)
             );
 
+        private DelegateCommand _searchCommand;
+        public DelegateCommand SearchCommand =>
+            _searchCommand ?? (_searchCommand = new DelegateCommand(ExecuteSearchCommand));
+
+        private async void ExecuteSearchCommand()
+        {
+            IsLoading = true;
+            TodoQueryObject todoQueryObject = new TodoQueryObject()
+            {
+                Title = SearchTitle,
+                Status = SearchStatus.Value,
+            };
+            ApiResponse response = await _apiClient.GetTodosAsync(todoQueryObject);
+            IsLoading = false;
+
+            if (!response.IsSuccess)
+            {
+                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("搜索结果异常, 请稍后重试");
+                return;
+            }
+
+            var todoItems = JsonSerializer.Deserialize<List<TodoItem>>(
+                (JsonElement)response.Data,
+                JsonHelper.Options
+            );
+
+            TodoItems = new ObservableCollection<TodoItem>(todoItems);
+        }
+
         /// <summary>
         /// 通过API保存待办事项数据
         /// </summary>
@@ -112,7 +164,8 @@ namespace MyTodo.Modules.Todo.ViewModels
 
         private DelegateCommand<TodoItem> _deleteCommand;
         public DelegateCommand<TodoItem> DeleteCommand =>
-            _deleteCommand ?? (_deleteCommand = new DelegateCommand<TodoItem>(ExecuteDeleteCommand));
+            _deleteCommand
+            ?? (_deleteCommand = new DelegateCommand<TodoItem>(ExecuteDeleteCommand));
 
         private async void ExecuteDeleteCommand(TodoItem todoItem)
         {
@@ -136,6 +189,13 @@ namespace MyTodo.Modules.Todo.ViewModels
         {
             _eventAggregator = eventAggregator;
             _apiClient = apiClient;
+
+            TodoStatuses = new List<TodoStatus>()
+            {
+                new TodoStatus() { Name = "全部", Value = -1 },
+                new TodoStatus() { Name = "待办", Value = 0 },
+                new TodoStatus() { Name = "已完成", Value = 1 },
+            };
         }
 
         /// <summary>
