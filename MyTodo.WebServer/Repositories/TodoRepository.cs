@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyTodo.WebServer.Data;
 using MyTodo.WebServer.DTOs.Todo;
+using MyTodo.WebServer.Helpers;
 using MyTodo.WebServer.Models;
 
 namespace MyTodo.WebServer.Repositories
@@ -45,12 +46,25 @@ namespace MyTodo.WebServer.Repositories
             return todo;
         }
 
-        public async Task<List<Todo>> GetAllAsync()
+        public async Task<List<Todo>> GetAllAsync(TodoQueryObject queryObject)
         {
-            List<Todo> todos = await _dbContext.Todos
+            IQueryable<Todo> todoQueryable = _dbContext.Todos.AsQueryable();
+
+            if (queryObject.Status != -1)
+            {
+                todoQueryable = todoQueryable.Where(t => t.Status == queryObject.Status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(queryObject.Title))
+            {
+                todoQueryable = todoQueryable.Where(t => t.Title.Contains(queryObject.Title));
+            }
+
+            List<Todo> todos = await todoQueryable
                 .OrderBy(t => t.Status)
                 .ThenByDescending(t => t.CreatedAt)
                 .ToListAsync();
+
             return todos;
         }
 
@@ -81,11 +95,7 @@ namespace MyTodo.WebServer.Repositories
         {
             int totalCount = await _dbContext.Todos.CountAsync();
             int finishedCount = await _dbContext.Todos.Where(t => t.Status == 1).CountAsync();
-            return new StatisticDTO()
-            {
-                TotalCount = totalCount,
-                FinishedCount = finishedCount,
-            };
+            return new StatisticDTO() { TotalCount = totalCount, FinishedCount = finishedCount };
         }
     }
 }

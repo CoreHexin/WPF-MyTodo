@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyTodo.WebServer.DTOs.Todo;
+using MyTodo.WebServer.Helpers;
 using MyTodo.WebServer.Models;
 using MyTodo.WebServer.Repositories;
 
@@ -43,10 +44,10 @@ namespace MyTodo.WebServer.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] TodoQueryObject queryObject)
         {
             var response = new ApiResponse();
-            List<Todo> todos = await _todoRepository.GetAllAsync();
+            List<Todo> todos = await _todoRepository.GetAllAsync(queryObject);
             response.IsSuccess = true;
             response.Data = todos;
             return Ok(response);
