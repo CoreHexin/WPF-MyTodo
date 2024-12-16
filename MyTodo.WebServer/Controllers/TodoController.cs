@@ -65,5 +65,18 @@ namespace MyTodo.WebServer.Controllers
             response.Data = todo;
             return Ok(response);
         }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var response = new ApiResponse();
+            Todo? todo = await _todoRepository.DeleteAsync(id);
+            if (todo == null)
+            {
+                return NotFound();
+            }
+            response.IsSuccess = true;
+            return Ok(response);
+        }
     }
 }
