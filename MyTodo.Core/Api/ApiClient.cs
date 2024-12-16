@@ -131,6 +131,26 @@ namespace MyTodo.Core.Api
         }
 
         /// <summary>
+        /// 删除待办事项
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse?> DeleteTodoAsync(int id)
+        {
+            RestResponse response;
+            var request = new RestRequest($"todo/{id}");
+            try
+            {
+                response = await _client.DeleteAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+            return ParseResponse(response);
+        }
+
+        /// <summary>
         /// 解析响应
         /// </summary>
         /// <param name="response"></param>
