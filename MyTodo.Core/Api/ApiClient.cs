@@ -160,6 +160,21 @@ namespace MyTodo.Core.Api
             return ParseResponse(response);
         }
 
+        public async Task<ApiResponse?> CountMemoAsync()
+        {
+            RestResponse response;
+            var request = new RestRequest("memo/total");
+            try
+            {
+                response = await _client.GetAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+            return ParseResponse(response);
+        }
+
         /// <summary>
         /// 解析响应
         /// </summary>

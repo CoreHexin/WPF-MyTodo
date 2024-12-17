@@ -145,7 +145,7 @@ namespace MyTodo.Modules.Index.ViewModels
 
             NavigationParameters navigationParameter = new NavigationParameters
             {
-                { "Title", statisticPanel.Title }
+                { "Title", statisticPanel.Title },
             };
 
             _regionManager
@@ -291,7 +291,7 @@ namespace MyTodo.Modules.Index.ViewModels
                     Content = "",
                     Background = "#FF0CA0FF",
                     Target = "TodoView",
-                    Cursor = "Hand"
+                    Cursor = "Hand",
                 },
                 new StatisticPanel()
                 {
@@ -300,7 +300,7 @@ namespace MyTodo.Modules.Index.ViewModels
                     Content = "",
                     Background = "#FF1ECA3A",
                     Target = "TodoView",
-                    Cursor = "Hand"
+                    Cursor = "Hand",
                 },
                 new StatisticPanel()
                 {
@@ -309,16 +309,16 @@ namespace MyTodo.Modules.Index.ViewModels
                     Content = "",
                     Background = "#FF02C6DC",
                     Target = string.Empty,
-                    Cursor = null
+                    Cursor = null,
                 },
                 new StatisticPanel()
                 {
                     Icon = "PlaylistStar",
                     Title = "备忘录",
-                    Content = "8",
+                    Content = "",
                     Background = "#FFFFA000",
                     Target = "MemoView",
-                    Cursor = "Hand"
+                    Cursor = "Hand",
                 },
             };
 
@@ -330,22 +330,29 @@ namespace MyTodo.Modules.Index.ViewModels
         /// </summary>
         private async Task RefreshStatisticPanelsAsync()
         {
-            ApiResponse response = await _apiClient.GetTodoStatisticAsync();
+            Task<ApiResponse?> todoTask = _apiClient.GetTodoStatisticAsync();
+            Task<ApiResponse?> memoTask = _apiClient.CountMemoAsync();
 
-            if (response.IsSuccess != true)
+            ApiResponse todoResponse = await todoTask;
+            ApiResponse memoResponse = await memoTask;
+
+            if (todoResponse.IsSuccess != true || memoResponse.IsSuccess != true)
             {
                 _eventAggregator.GetEvent<PopupMessageEvent>().Publish("获取统计数据异常");
                 return;
             }
 
             var statisticDTO = JsonSerializer.Deserialize<StatisticDTO>(
-                (JsonElement)response.Data,
+                (JsonElement)todoResponse.Data,
                 JsonHelper.Options
             );
+
+            int memoCount = ((JsonElement)memoResponse.Data).GetInt32();
 
             StatisticPanels[0].Content = statisticDTO.TotalCount.ToString();
             StatisticPanels[1].Content = statisticDTO.FinishedCount.ToString();
             StatisticPanels[2].Content = statisticDTO.FinishedRatio;
+            StatisticPanels[3].Content = memoCount.ToString();
         }
     }
 }
