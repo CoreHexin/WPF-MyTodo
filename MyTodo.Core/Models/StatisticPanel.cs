@@ -18,5 +18,7 @@ namespace MyTodo.Core.Models
         public string Background { get; set; }
 
         public string Target { get; set; }
+
+        public string? Cursor { get; set; }
     }
 }

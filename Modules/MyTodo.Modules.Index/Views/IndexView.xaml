@@ -53,7 +53,16 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <local:StatisticPanelControl Margin="10" DataContext="{Binding}" />
+                    <local:StatisticPanelControl
+                        Margin="10"
+                        Cursor="{Binding Cursor, TargetNullValue={x:Null}}"
+                        DataContext="{Binding}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:InvokeCommandAction Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </local:StatisticPanelControl>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

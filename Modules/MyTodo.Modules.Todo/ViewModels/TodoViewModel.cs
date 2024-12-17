@@ -12,26 +12,30 @@ using MyTodo.Core.Models;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
 
 namespace MyTodo.Modules.Todo.ViewModels
 {
-    public class TodoViewModel : BindableBase
+    public class TodoViewModel : BindableBase, INavigationAware
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly ApiClient _apiClient;
 
+        #region 属性
         public List<TodoStatus> TodoStatuses { get; set; }
 
-        public TodoStatus SearchStatus { get; set; }
+        private TodoStatus _searchStatus;
+        public TodoStatus SearchStatus
+        {
+            get { return _searchStatus; }
+            set { SetProperty(ref _searchStatus, value); }
+        }
 
         private string _searchTitle;
 
-        public string SearchTitle 
+        public string SearchTitle
         {
-            get
-            {
-                return _searchTitle;
-            }
+            get { return _searchTitle; }
             set
             {
                 if (_searchTitle != value)
@@ -69,6 +73,9 @@ namespace MyTodo.Modules.Todo.ViewModels
             get { return _todoItems; }
             set { SetProperty(ref _todoItems, value); }
         }
+        #endregion
+
+        #region 命令
 
         private DelegateCommand _openRightDrawerCommand;
 
@@ -79,17 +86,6 @@ namespace MyTodo.Modules.Todo.ViewModels
         private void ExecuteOpenRightDrawerCommand()
         {
             IsRightDrawerOpen = true;
-        }
-
-        private DelegateCommand _loadDataCommand;
-        public DelegateCommand LoadDataCommand =>
-            _loadDataCommand ?? (_loadDataCommand = new DelegateCommand(ExecuteLoadDataCommand));
-
-        private async void ExecuteLoadDataCommand()
-        {
-            IsLoading = true;
-            await RefreshTodoItemsAsync();
-            IsLoading = false;
         }
 
         private DelegateCommand _saveCommand;
@@ -108,27 +104,7 @@ namespace MyTodo.Modules.Todo.ViewModels
 
         private async void ExecuteSearchCommand()
         {
-            IsLoading = true;
-            TodoQueryObject todoQueryObject = new TodoQueryObject()
-            {
-                Title = SearchTitle,
-                Status = SearchStatus.Value,
-            };
-            ApiResponse response = await _apiClient.GetTodosAsync(todoQueryObject);
-            IsLoading = false;
-
-            if (!response.IsSuccess)
-            {
-                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("搜索结果异常, 请稍后重试");
-                return;
-            }
-
-            var todoItems = JsonSerializer.Deserialize<List<TodoItem>>(
-                (JsonElement)response.Data,
-                JsonHelper.Options
-            );
-
-            TodoItems = new ObservableCollection<TodoItem>(todoItems);
+            await SearchAsync();
         }
 
         /// <summary>
@@ -149,7 +125,7 @@ namespace MyTodo.Modules.Todo.ViewModels
 
             IsRightDrawerOpen = false;
             _eventAggregator.GetEvent<PopupMessageEvent>().Publish("创建待办事项成功");
-            await RefreshTodoItemsAsync();
+            await SearchAsync();
             IsLoading = false;
         }
 
@@ -185,6 +161,8 @@ namespace MyTodo.Modules.Todo.ViewModels
             TodoItems.Remove(todoItem);
         }
 
+        #endregion
+
         public TodoViewModel(IEventAggregator eventAggregator, ApiClient apiClient)
         {
             _eventAggregator = eventAggregator;
@@ -199,15 +177,24 @@ namespace MyTodo.Modules.Todo.ViewModels
         }
 
         /// <summary>
-        /// 通过api更新待办事项列表数据
+        /// 查询待办事项
         /// </summary>
-        private async Task RefreshTodoItemsAsync()
+        /// <returns></returns>
+        private async Task SearchAsync()
         {
-            ApiResponse response = await _apiClient.GetTodosAsync();
-
-            if (response.IsSuccess != true)
+            TodoQueryObject todoQueryObject = new TodoQueryObject()
             {
-                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("获取待办事项列表数据异常");
+                Title = SearchTitle,
+                Status = SearchStatus.Value,
+            };
+
+            IsLoading = true;
+            ApiResponse response = await _apiClient.GetTodosAsync(todoQueryObject);
+            IsLoading = false;
+
+            if (!response.IsSuccess)
+            {
+                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("搜索结果异常, 请稍后重试");
                 return;
             }
 
@@ -218,5 +205,26 @@ namespace MyTodo.Modules.Todo.ViewModels
 
             TodoItems = new ObservableCollection<TodoItem>(todoItems);
         }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            string title = navigationContext.Parameters.GetValue<string>("Title");
+            if (title == "已完成")
+            {
+                SearchStatus = TodoStatuses[2];
+            }
+            else
+            {
+                SearchStatus = TodoStatuses[0];
+            }
+            ExecuteSearchCommand();
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext) { }
     }
 }

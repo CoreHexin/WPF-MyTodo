@@ -12,12 +12,6 @@
     prism:ViewModelLocator.AutoWireViewModel="True"
     mc:Ignorable="d">
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadDataCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-
     <Grid>
         <!--  加载动画  -->
         <materialDesign:DialogHost

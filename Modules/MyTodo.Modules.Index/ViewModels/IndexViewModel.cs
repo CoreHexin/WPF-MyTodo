@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using MyTodo.Core;
 using MyTodo.Core.Api;
 using MyTodo.Core.DTOs;
 using MyTodo.Core.Events;
@@ -13,6 +14,7 @@ using MyTodo.Modules.Index.Views;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
 using Prism.Services.Dialogs;
 
 namespace MyTodo.Modules.Index.ViewModels
@@ -22,7 +24,9 @@ namespace MyTodo.Modules.Index.ViewModels
         private readonly ApiClient _apiClient;
         private readonly IEventAggregator _eventAggregator;
         private readonly IDialogService _dialogService;
+        private readonly IRegionManager _regionManager;
 
+        #region 属性
         private string _welcomeMessage;
         public string WelcomeMessage
         {
@@ -58,11 +62,17 @@ namespace MyTodo.Modules.Index.ViewModels
             get { return _memoItems; }
             set { SetProperty(ref _memoItems, value); }
         }
+        #endregion
 
+        #region 命令
         private DelegateCommand _showCreateTodoDialogCommand;
         public DelegateCommand ShowCreateTodoDialogCommand =>
             _showCreateTodoDialogCommand
-            ?? (_showCreateTodoDialogCommand = new DelegateCommand(ExecuteShowCreateTodoDialogCommand));
+            ?? (
+                _showCreateTodoDialogCommand = new DelegateCommand(
+                    ExecuteShowCreateTodoDialogCommand
+                )
+            );
 
         private DelegateCommand<TodoItem> _updateTodoStatusCommand;
         public DelegateCommand<TodoItem> UpdateTodoStatusCommand =>
@@ -81,7 +91,9 @@ namespace MyTodo.Modules.Index.ViewModels
         public DelegateCommand<TodoItem> ShowUpdateTodoDialogCommand =>
             _showUpdateTodoDialogCommand
             ?? (
-                _showUpdateTodoDialogCommand = new DelegateCommand<TodoItem>(ExecuteShowUpdateTodoDialogCommand)
+                _showUpdateTodoDialogCommand = new DelegateCommand<TodoItem>(
+                    ExecuteShowUpdateTodoDialogCommand
+                )
             );
 
         /// <summary>
@@ -118,15 +130,41 @@ namespace MyTodo.Modules.Index.ViewModels
             IsLoading = false;
         }
 
+        // 统计面板导航命令
+        private DelegateCommand<StatisticPanel> _navigateCommand;
+        public DelegateCommand<StatisticPanel> NavigateCommand =>
+            _navigateCommand
+            ?? (_navigateCommand = new DelegateCommand<StatisticPanel>(ExecuteNavigateCommand));
+
+        private void ExecuteNavigateCommand(StatisticPanel statisticPanel)
+        {
+            if (statisticPanel.Target == string.Empty)
+            {
+                return;
+            }
+
+            NavigationParameters navigationParameter = new NavigationParameters
+            {
+                { "Title", statisticPanel.Title }
+            };
+
+            _regionManager
+                .Regions[RegionNames.ContentRegion]
+                .RequestNavigate(statisticPanel.Target, navigationParameter);
+        }
+        #endregion
+
         public IndexViewModel(
             ApiClient apiClient,
             IEventAggregator eventAggregator,
-            IDialogService dialogService
+            IDialogService dialogService,
+            IRegionManager regionManager
         )
         {
             _apiClient = apiClient;
             _eventAggregator = eventAggregator;
             _dialogService = dialogService;
+            _regionManager = regionManager;
         }
 
         /// <summary>
@@ -252,7 +290,8 @@ namespace MyTodo.Modules.Index.ViewModels
                     Title = "汇总",
                     Content = "",
                     Background = "#FF0CA0FF",
-                    Target = "",
+                    Target = "TodoView",
+                    Cursor = "Hand"
                 },
                 new StatisticPanel()
                 {
@@ -260,7 +299,8 @@ namespace MyTodo.Modules.Index.ViewModels
                     Title = "已完成",
                     Content = "",
                     Background = "#FF1ECA3A",
-                    Target = "",
+                    Target = "TodoView",
+                    Cursor = "Hand"
                 },
                 new StatisticPanel()
                 {
@@ -268,7 +308,8 @@ namespace MyTodo.Modules.Index.ViewModels
                     Title = "完成率",
                     Content = "",
                     Background = "#FF02C6DC",
-                    Target = "",
+                    Target = string.Empty,
+                    Cursor = null
                 },
                 new StatisticPanel()
                 {
@@ -276,7 +317,8 @@ namespace MyTodo.Modules.Index.ViewModels
                     Title = "备忘录",
                     Content = "8",
                     Background = "#FFFFA000",
-                    Target = "",
+                    Target = "MemoView",
+                    Cursor = "Hand"
                 },
             };
 
