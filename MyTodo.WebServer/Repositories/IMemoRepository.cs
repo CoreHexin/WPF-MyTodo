@@ -10,5 +10,6 @@ namespace MyTodo.WebServer.Repositories
         Task<Memo?> CreateAsync(MemoForCreateDTO MemoForCreateDTO);
         Task<Memo?> UpdateAsync(int id, MemoForUpdateDTO MemoForUpdateDTO);
         Task<Memo?> DeleteAsync(int id);
+        Task<int> CountAsync();
     }
 }

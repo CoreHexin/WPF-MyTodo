@@ -77,5 +77,10 @@ namespace MyTodo.WebServer.Repositories
                 return null;
             return memo;
         }
+
+        public async Task<int> CountAsync()
+        {
+            return await _dbContext.Memos.CountAsync();
+        }
     }
 }

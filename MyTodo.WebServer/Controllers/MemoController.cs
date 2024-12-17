@@ -87,5 +87,15 @@ namespace MyTodo.WebServer.Controllers
             response.Data = memo;
             return Ok(response);
         }
+
+        [HttpGet("total")]
+        public async Task<IActionResult> Count()
+        {
+            int count = await _memoRepository.CountAsync();
+            ApiResponse response = new ApiResponse();
+            response.IsSuccess = true;
+            response.Data = count;
+            return Ok(response);
+        }
     }
 }
