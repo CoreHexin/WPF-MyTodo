@@ -183,7 +183,6 @@
                                             Text="{Binding Title}" />
                                         <TextBlock Text="{Binding Content}" />
                                     </StackPanel>
-                                    <ToggleButton HorizontalAlignment="Right" Style="{StaticResource MaterialDesignSwitchSecondaryToggleButton}" />
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

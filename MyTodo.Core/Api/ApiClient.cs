@@ -175,6 +175,32 @@ namespace MyTodo.Core.Api
             return ParseResponse(response);
         }
 
+        public async Task<ApiResponse?> GetMemosAsync(string? title = null)
+        {
+            RestResponse response;
+            RestRequest request;
+
+            if (title == null || string.IsNullOrWhiteSpace(title))
+            {
+                request = new RestRequest("memo");
+            }
+            else
+            {
+                request = new RestRequest($"memo?title={title}");
+            }
+
+            try
+            {
+                response = await _client.GetAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+
+            return ParseResponse(response);
+        }
+
         /// <summary>
         /// 解析响应
         /// </summary>

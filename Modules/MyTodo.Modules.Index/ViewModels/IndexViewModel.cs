@@ -175,8 +175,14 @@ namespace MyTodo.Modules.Index.ViewModels
             UpdateWelcomeMessage();
 
             IsLoading = true;
-            await CreateStatisticPanelsAsync();
-            await RefreshTodoItemsAsync();
+
+            var statisticTask = CreateStatisticPanelsAsync();
+            var todoItemsTask = RefreshTodoItemsAsync();
+            var memoItemsTask = RefreshMemoItemsAsync();
+            await statisticTask;
+            await todoItemsTask;
+            await memoItemsTask;
+
             IsLoading = false;
         }
 
@@ -257,6 +263,24 @@ namespace MyTodo.Modules.Index.ViewModels
             );
 
             TodoItems = new ObservableCollection<TodoItem>(todoItems);
+        }
+
+        private async Task RefreshMemoItemsAsync()
+        {
+            ApiResponse response = await _apiClient.GetMemosAsync();
+
+            if (response.IsSuccess != true)
+            {
+                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("获取备忘录数据异常");
+                return;
+            }
+
+            var memoItems = JsonSerializer.Deserialize<List<MemoItem>>(
+                (JsonElement)response.Data,
+                JsonHelper.Options
+            );
+
+            MemoItems = new ObservableCollection<MemoItem>(memoItems);
         }
 
         private void UpdateWelcomeMessage()
