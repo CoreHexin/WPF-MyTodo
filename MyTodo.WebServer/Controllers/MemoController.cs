@@ -74,7 +74,7 @@ namespace MyTodo.WebServer.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] MemoForUpdateDTO memoDTO)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] MemoForUpdateDTO memoDTO)
         {
             Memo? memo = await _memoRepository.UpdateAsync(id, memoDTO);
             if (memo == null)
