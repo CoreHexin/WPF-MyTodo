@@ -58,23 +58,16 @@ namespace MyTodo.Modules.Index.ViewModels
         }
 
         private ObservableCollection<MemoItem> _memoItems;
-
         public ObservableCollection<MemoItem> MemoItems
         {
             get { return _memoItems; }
             set { SetProperty(ref _memoItems, value); }
         }
-        #endregion
-
 
         private DelegateCommand _showCreateTodoDialogCommand;
         public DelegateCommand ShowCreateTodoDialogCommand =>
             _showCreateTodoDialogCommand
-            ?? (
-                _showCreateTodoDialogCommand = new DelegateCommand(
-                    ExecuteShowCreateTodoDialogCommand
-                )
-            );
+            ?? (_showCreateTodoDialogCommand = new DelegateCommand(ShowCreateTodoDialog));
 
         private DelegateCommand _showCreateMemoDialogCommand;
         public DelegateCommand ShowCreateMemoDialogCommand =>
@@ -92,74 +85,25 @@ namespace MyTodo.Modules.Index.ViewModels
 
         private DelegateCommand _loadDataCommand;
         public DelegateCommand LoadDataCommand =>
-            _loadDataCommand ?? (_loadDataCommand = new DelegateCommand(ExecuteLoadDataCommand));
+            _loadDataCommand ?? (_loadDataCommand = new DelegateCommand(LoadData));
 
         private DelegateCommand<TodoItem> _showUpdateTodoDialogCommand;
         public DelegateCommand<TodoItem> ShowUpdateTodoDialogCommand =>
             _showUpdateTodoDialogCommand
-            ?? (
-                _showUpdateTodoDialogCommand = new DelegateCommand<TodoItem>(
-                    ExecuteShowUpdateTodoDialogCommand
-                )
-            );
+            ?? (_showUpdateTodoDialogCommand = new DelegateCommand<TodoItem>(ShowUpdateTodoDialog));
 
-        /// <summary>
-        /// 弹出修改TodoItem对话框
-        /// </summary>
-        /// <param name="todoItem"></param>
-        public void ExecuteShowUpdateTodoDialogCommand(TodoItem todoItem)
-        {
-            DialogParameters dialogParameters = new DialogParameters();
-            dialogParameters.Add("TodoItem", todoItem);
-
-            _dialogService.ShowDialog(
-                nameof(UpdateTodoDialog),
-                dialogParameters,
-                UpdateTodoDialogCallback
-            );
-        }
-
-        private async void UpdateTodoDialogCallback(IDialogResult dialogResult)
-        {
-            if (dialogResult.Result != ButtonResult.OK)
-            {
-                return;
-            }
-
-            IsLoading = true;
-
-            // 更新统计面板数据
-            await RefreshStatisticPanelsAsync();
-
-            // 更新待办事项数据
-            await RefreshTodoItemsAsync();
-
-            IsLoading = false;
-        }
+        private DelegateCommand<MemoItem> _showUpdateMemoDialogCommand;
+        public DelegateCommand<MemoItem> ShowUpdateMemoDialogCommand =>
+            _showUpdateMemoDialogCommand
+            ?? (_showUpdateMemoDialogCommand = new DelegateCommand<MemoItem>(ShowUpdateMemoDialog));
 
         // 统计面板导航命令
         private DelegateCommand<StatisticPanel> _navigateCommand;
         public DelegateCommand<StatisticPanel> NavigateCommand =>
-            _navigateCommand
-            ?? (_navigateCommand = new DelegateCommand<StatisticPanel>(ExecuteNavigateCommand));
+            _navigateCommand ?? (_navigateCommand = new DelegateCommand<StatisticPanel>(Navigate));
+        #endregion
 
-        private void ExecuteNavigateCommand(StatisticPanel statisticPanel)
-        {
-            if (statisticPanel.Target == string.Empty)
-            {
-                return;
-            }
-
-            NavigationParameters navigationParameter = new NavigationParameters
-            {
-                { "Title", statisticPanel.Title },
-            };
-
-            _regionManager
-                .Regions[RegionNames.ContentRegion]
-                .RequestNavigate(statisticPanel.Target, navigationParameter);
-        }
-
+        #region 构造函数
         public IndexViewModel(
             ApiClient apiClient,
             IEventAggregator eventAggregator,
@@ -172,12 +116,13 @@ namespace MyTodo.Modules.Index.ViewModels
             _dialogService = dialogService;
             _regionManager = regionManager;
         }
+        #endregion
 
         #region 方法
         /// <summary>
         /// 加载首页数据
         /// </summary>
-        private async void ExecuteLoadDataCommand()
+        private async void LoadData()
         {
             UpdateWelcomeMessage();
 
@@ -224,7 +169,7 @@ namespace MyTodo.Modules.Index.ViewModels
         /// <summary>
         /// 打开添加待办事项对话框
         /// </summary>
-        private void ExecuteShowCreateTodoDialogCommand()
+        private void ShowCreateTodoDialog()
         {
             _dialogService.ShowDialog(nameof(CreateTodoDialog), CreateTodoDialogCallback);
         }
@@ -426,6 +371,80 @@ namespace MyTodo.Modules.Index.ViewModels
 
             int memoCount = ((JsonElement)response.Data).GetInt32();
             StatisticPanels[3].Content = memoCount.ToString();
+        }
+
+        private void Navigate(StatisticPanel statisticPanel)
+        {
+            if (statisticPanel.Target == string.Empty)
+            {
+                return;
+            }
+
+            NavigationParameters navigationParameter = new NavigationParameters
+            {
+                { "Title", statisticPanel.Title },
+            };
+
+            _regionManager
+                .Regions[RegionNames.ContentRegion]
+                .RequestNavigate(statisticPanel.Target, navigationParameter);
+        }
+
+        private void ShowUpdateMemoDialog(MemoItem memoItem)
+        {
+            DialogParameters parameters = new DialogParameters() { { "MemoItem", memoItem } };
+
+            _dialogService.ShowDialog(
+                nameof(UpdateMemoDialog),
+                parameters,
+                UpdateMemoDialogCallback
+            );
+        }
+
+        private async void UpdateMemoDialogCallback(IDialogResult dialogResult)
+        {
+            if (dialogResult.Result != ButtonResult.OK)
+            {
+                return;
+            }
+
+            IsLoading = true;
+            var memoStatisticTask = RefreshMemoCountAsync();
+            var memoListTask = RefreshMemoItemsAsync();
+            await memoStatisticTask;
+            await memoListTask;
+            IsLoading = false;
+        }
+
+        /// <summary>
+        /// 弹出修改TodoItem对话框
+        /// </summary>
+        /// <param name="todoItem"></param>
+        public void ShowUpdateTodoDialog(TodoItem todoItem)
+        {
+            DialogParameters dialogParameters = new DialogParameters();
+            dialogParameters.Add("TodoItem", todoItem);
+
+            _dialogService.ShowDialog(
+                nameof(UpdateTodoDialog),
+                dialogParameters,
+                UpdateTodoDialogCallback
+            );
+        }
+
+        private async void UpdateTodoDialogCallback(IDialogResult dialogResult)
+        {
+            if (dialogResult.Result != ButtonResult.OK)
+            {
+                return;
+            }
+
+            IsLoading = true;
+            var todoStatisticTask = RefreshTodoStatisticAsync();
+            var todoListTask = RefreshTodoItemsAsync();
+            await todoStatisticTask;
+            await todoListTask;
+            IsLoading = false;
         }
 
         #endregion

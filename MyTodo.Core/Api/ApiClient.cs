@@ -226,7 +226,7 @@ namespace MyTodo.Core.Api
         public async Task<ApiResponse?> UpdateMemoAsync(int id, MemoForUpdateDTO memoDTO)
         {
             RestResponse response;
-            RestRequest request = new RestRequest("memo").AddJsonBody(memoDTO);
+            RestRequest request = new RestRequest($"memo/{id}").AddJsonBody(memoDTO);
 
             try
             {
