@@ -73,12 +73,8 @@ namespace MyTodo.Modules.Todo.ViewModels
             get { return _todoItems; }
             set { SetProperty(ref _todoItems, value); }
         }
-        #endregion
-
-        #region 命令
 
         private DelegateCommand _openRightDrawerCommand;
-
         public DelegateCommand OpenRightDrawerCommand =>
             _openRightDrawerCommand
             ?? (_openRightDrawerCommand = new DelegateCommand(ExecuteOpenRightDrawerCommand));
