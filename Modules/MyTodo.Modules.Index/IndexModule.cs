@@ -19,6 +19,8 @@ namespace MyTodo.Modules.Index
 
             containerRegistry.RegisterDialog<CreateTodoDialog, CreateTodoDialogViewModel>();
             containerRegistry.RegisterDialog<UpdateTodoDialog, UpdateTodoDialogViewModel>();
+
+            containerRegistry.RegisterDialog<CreateMemoDialog, CreateMemoDialogViewModel>();
         }
     }
 }

@@ -21,10 +21,12 @@ namespace MyTodo.Modules.Index.ViewModels
 {
     public class IndexViewModel : BindableBase
     {
+        #region 字段
         private readonly ApiClient _apiClient;
         private readonly IEventAggregator _eventAggregator;
         private readonly IDialogService _dialogService;
         private readonly IRegionManager _regionManager;
+        #endregion
 
         #region 属性
         private string _welcomeMessage;
@@ -64,7 +66,7 @@ namespace MyTodo.Modules.Index.ViewModels
         }
         #endregion
 
-        #region 命令
+
         private DelegateCommand _showCreateTodoDialogCommand;
         public DelegateCommand ShowCreateTodoDialogCommand =>
             _showCreateTodoDialogCommand
@@ -73,6 +75,11 @@ namespace MyTodo.Modules.Index.ViewModels
                     ExecuteShowCreateTodoDialogCommand
                 )
             );
+
+        private DelegateCommand _showCreateMemoDialogCommand;
+        public DelegateCommand ShowCreateMemoDialogCommand =>
+            _showCreateMemoDialogCommand
+            ?? (_showCreateMemoDialogCommand = new DelegateCommand(ShowCreateMemoDialog));
 
         private DelegateCommand<TodoItem> _updateTodoStatusCommand;
         public DelegateCommand<TodoItem> UpdateTodoStatusCommand =>
@@ -152,7 +159,6 @@ namespace MyTodo.Modules.Index.ViewModels
                 .Regions[RegionNames.ContentRegion]
                 .RequestNavigate(statisticPanel.Target, navigationParameter);
         }
-        #endregion
 
         public IndexViewModel(
             ApiClient apiClient,
@@ -167,6 +173,7 @@ namespace MyTodo.Modules.Index.ViewModels
             _regionManager = regionManager;
         }
 
+        #region 方法
         /// <summary>
         /// 加载首页数据
         /// </summary>
@@ -175,14 +182,12 @@ namespace MyTodo.Modules.Index.ViewModels
             UpdateWelcomeMessage();
 
             IsLoading = true;
-
             var statisticTask = CreateStatisticPanelsAsync();
             var todoItemsTask = RefreshTodoItemsAsync();
             var memoItemsTask = RefreshMemoItemsAsync();
             await statisticTask;
             await todoItemsTask;
             await memoItemsTask;
-
             IsLoading = false;
         }
 
@@ -225,7 +230,7 @@ namespace MyTodo.Modules.Index.ViewModels
         }
 
         /// <summary>
-        /// 待办事项对话框关闭后的回调方法
+        /// 添加待办事项对话框关闭后的回调方法
         /// </summary>
         /// <param name="dialogResult"></param>
         private async void CreateTodoDialogCallback(IDialogResult dialogResult)
@@ -234,13 +239,35 @@ namespace MyTodo.Modules.Index.ViewModels
                 return;
 
             IsLoading = true;
+            var todoStatisticTask = RefreshTodoStatisticAsync();
+            var todoListTask = RefreshTodoItemsAsync();
+            await todoStatisticTask;
+            await todoListTask;
+            IsLoading = false;
+        }
 
-            // 更新统计面板数据
-            await RefreshStatisticPanelsAsync();
+        /// <summary>
+        /// 打开添加备忘录对话框
+        /// </summary>
+        private void ShowCreateMemoDialog()
+        {
+            _dialogService.ShowDialog(nameof(CreateMemoDialog), CreateMemoDialogCallback);
+        }
 
-            // 更新待办事项数据
-            await RefreshTodoItemsAsync();
+        /// <summary>
+        /// 添加备忘录对话框关闭后的回调方法
+        /// </summary>
+        /// <param name="dialogResult"></param>
+        private async void CreateMemoDialogCallback(IDialogResult dialogResult)
+        {
+            if (dialogResult.Result != ButtonResult.OK)
+                return;
 
+            IsLoading = true;
+            var memoStatisticTask = RefreshMemoCountAsync();
+            var memoListTask = RefreshMemoItemsAsync();
+            await memoStatisticTask;
+            await memoListTask;
             IsLoading = false;
         }
 
@@ -350,33 +377,57 @@ namespace MyTodo.Modules.Index.ViewModels
         }
 
         /// <summary>
-        /// 通过api更新统计面板数据
+        /// 更新统计面板数据
         /// </summary>
         private async Task RefreshStatisticPanelsAsync()
         {
-            Task<ApiResponse?> todoTask = _apiClient.GetTodoStatisticAsync();
-            Task<ApiResponse?> memoTask = _apiClient.CountMemoAsync();
+            var todoStatisticTask = RefreshTodoStatisticAsync();
+            var memoStatisticTask = RefreshMemoCountAsync();
+            await todoStatisticTask;
+            await memoStatisticTask;
+        }
 
-            ApiResponse todoResponse = await todoTask;
-            ApiResponse memoResponse = await memoTask;
-
-            if (todoResponse.IsSuccess != true || memoResponse.IsSuccess != true)
+        /// <summary>
+        /// 更新待办事项统计数据
+        /// </summary>
+        /// <returns></returns>
+        private async Task RefreshTodoStatisticAsync()
+        {
+            var response = await _apiClient.GetTodoStatisticAsync();
+            if (response.IsSuccess != true)
             {
                 _eventAggregator.GetEvent<PopupMessageEvent>().Publish("获取统计数据异常");
                 return;
             }
 
             var statisticDTO = JsonSerializer.Deserialize<StatisticDTO>(
-                (JsonElement)todoResponse.Data,
+                (JsonElement)response.Data,
                 JsonHelper.Options
             );
-
-            int memoCount = ((JsonElement)memoResponse.Data).GetInt32();
 
             StatisticPanels[0].Content = statisticDTO.TotalCount.ToString();
             StatisticPanels[1].Content = statisticDTO.FinishedCount.ToString();
             StatisticPanels[2].Content = statisticDTO.FinishedRatio;
+        }
+
+        /// <summary>
+        /// 更新备忘录统计数据
+        /// </summary>
+        /// <returns></returns>
+        private async Task RefreshMemoCountAsync()
+        {
+            var response = await _apiClient.CountMemoAsync();
+
+            if (response.IsSuccess != true)
+            {
+                _eventAggregator.GetEvent<PopupMessageEvent>().Publish("获取备忘录统计数据异常");
+                return;
+            }
+
+            int memoCount = ((JsonElement)response.Data).GetInt32();
             StatisticPanels[3].Content = memoCount.ToString();
         }
+
+        #endregion
     }
 }

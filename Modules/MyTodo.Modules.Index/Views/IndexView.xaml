@@ -163,6 +163,7 @@
                         Height="30"
                         Margin="20,10"
                         HorizontalAlignment="Right"
+                        Command="{Binding ShowCreateMemoDialogCommand}"
                         Content="{materialDesign:PackIcon Kind=Add,
                                                           Size=24}"
                         Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryDarkButton}" />

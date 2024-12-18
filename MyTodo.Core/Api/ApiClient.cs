@@ -16,6 +16,7 @@ namespace MyTodo.Core.Api
             _client = new RestClient(options);
         }
 
+        #region 登录注册接口
         public async Task<ApiResponse?> LoginAsync(LoginModel loginModel)
         {
             RestResponse response;
@@ -47,7 +48,9 @@ namespace MyTodo.Core.Api
 
             return ParseResponse(response);
         }
+        #endregion
 
+        #region 待办事项接口
         /// <summary>
         /// 请求待办事项统计接口
         /// </summary>
@@ -159,7 +162,9 @@ namespace MyTodo.Core.Api
             }
             return ParseResponse(response);
         }
+        #endregion
 
+        #region 备忘录接口
         public async Task<ApiResponse?> CountMemoAsync()
         {
             RestResponse response;
@@ -200,6 +205,59 @@ namespace MyTodo.Core.Api
 
             return ParseResponse(response);
         }
+
+        public async Task<ApiResponse?> CreateMemoAsync(MemoForCreateDTO memoDTO)
+        {
+            RestResponse response;
+            RestRequest request = new RestRequest("memo").AddJsonBody(memoDTO);
+
+            try
+            {
+                response = await _client.PostAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+
+            return ParseResponse(response);
+        }
+
+        public async Task<ApiResponse?> UpdateMemoAsync(int id, MemoForUpdateDTO memoDTO)
+        {
+            RestResponse response;
+            RestRequest request = new RestRequest("memo").AddJsonBody(memoDTO);
+
+            try
+            {
+                response = await _client.PutAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+
+            return ParseResponse(response);
+        }
+
+        public async Task<ApiResponse?> DeleteMemoAsync(int id)
+        {
+            RestResponse response;
+            RestRequest request = new RestRequest($"memo/{id}");
+
+            try
+            {
+                response = await _client.DeleteAsync(request);
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse() { IsSuccess = false, Message = ex.Message };
+            }
+
+            return ParseResponse(response);
+        }
+
+        #endregion
 
         /// <summary>
         /// 解析响应
