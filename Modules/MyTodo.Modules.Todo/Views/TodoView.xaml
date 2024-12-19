@@ -171,6 +171,21 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </ScrollViewer>
+
+                    <StackPanel
+                        Grid.Row="1"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding HasSearchResult, Converter={converter:BoolToVisibility}}">
+                        <Image
+                            Width="120"
+                            Height="120"
+                            Source="/MyTodo.Core;component/Images/wind.png" />
+                        <TextBlock
+                            Margin="0,10"
+                            HorizontalAlignment="Center"
+                            FontSize="18"
+                            Text="没有找到待办事项" />
+                    </StackPanel>
                 </Grid>
             </materialDesign:DrawerHost>
         </materialDesign:DialogHost>

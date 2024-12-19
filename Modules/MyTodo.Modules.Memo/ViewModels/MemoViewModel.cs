@@ -17,11 +17,15 @@ namespace MyTodo.Modules.Memo.ViewModels
     public class MemoViewModel : BindableBase
     {
         #region 字段
+
         private readonly IEventAggregator _eventAggregator;
         private readonly ApiClient _apiClient;
+
         #endregion
 
         #region 属性
+        public bool HasSearchResult => MemoItems.Count > 0;
+
         private bool _isLoading;
         public bool IsLoading
         {
@@ -56,11 +60,17 @@ namespace MyTodo.Modules.Memo.ViewModels
             set { SetProperty(ref _memoForCreateDTO, value); }
         }
 
-        private ObservableCollection<MemoItem> _MemoItems;
+        private ObservableCollection<MemoItem> _MemoItems = new ObservableCollection<MemoItem>();
         public ObservableCollection<MemoItem> MemoItems
         {
             get { return _MemoItems; }
-            set { SetProperty(ref _MemoItems, value); }
+            set
+            {
+                if (SetProperty(ref _MemoItems, value))
+                {
+                    RaisePropertyChanged(nameof(HasSearchResult));
+                }
+            }
         }
 
         private DelegateCommand _openRightDrawerCommand;

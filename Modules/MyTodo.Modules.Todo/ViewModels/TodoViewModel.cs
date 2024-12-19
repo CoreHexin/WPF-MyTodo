@@ -24,6 +24,8 @@ namespace MyTodo.Modules.Todo.ViewModels
         #region 属性
         public List<TodoStatus> TodoStatuses { get; set; }
 
+        public bool HasSearchResult => TodoItems.Count > 0;
+
         private TodoStatus _searchStatus;
         public TodoStatus SearchStatus
         {
@@ -32,7 +34,6 @@ namespace MyTodo.Modules.Todo.ViewModels
         }
 
         private string _searchTitle;
-
         public string SearchTitle
         {
             get { return _searchTitle; }
@@ -67,11 +68,17 @@ namespace MyTodo.Modules.Todo.ViewModels
             set { SetProperty(ref _todoForCreateDTO, value); }
         }
 
-        private ObservableCollection<TodoItem> _todoItems;
+        private ObservableCollection<TodoItem> _todoItems = new ObservableCollection<TodoItem>();
         public ObservableCollection<TodoItem> TodoItems
         {
             get { return _todoItems; }
-            set { SetProperty(ref _todoItems, value); }
+            set
+            {
+                if (SetProperty(ref _todoItems, value))
+                {
+                    RaisePropertyChanged(nameof(HasSearchResult));
+                }
+            }
         }
 
         private DelegateCommand _openRightDrawerCommand;
