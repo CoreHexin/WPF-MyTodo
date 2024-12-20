@@ -2,6 +2,7 @@
 using MyTodo.ViewModels;
 using Prism.Events;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace MyTodo.Views
@@ -48,6 +49,11 @@ namespace MyTodo.Views
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            MessageBoxResult result = MessageBox.Show("确认关闭?", "温馨提示", MessageBoxButton.OKCancel);
+            if ( result != MessageBoxResult.OK)
+            {
+                return;
+            }
             Close();
         }
 
@@ -57,10 +63,11 @@ namespace MyTodo.Views
         }
 
         // 收起左侧抽屉菜单栏
-        private void ListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             MenuToggleButton.IsChecked = false;
         }
+
         private void PopupMessage(string msg)
         {
             snackbar.MessageQueue.Enqueue(msg);
