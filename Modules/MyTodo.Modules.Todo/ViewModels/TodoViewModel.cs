@@ -233,6 +233,7 @@ namespace MyTodo.Modules.Todo.ViewModels
                 SearchStatus = TodoStatuses[0];
             }
             ExecuteSearchCommand();
+            _eventAggregator.GetEvent<LeftMenuChangedEvent>().Publish("TodoView");
         }
 
         public bool IsNavigationTarget(NavigationContext navigationContext)

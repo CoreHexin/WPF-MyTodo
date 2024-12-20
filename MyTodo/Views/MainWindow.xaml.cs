@@ -12,15 +12,11 @@ namespace MyTodo.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly IEventAggregator _eventAggregator;
-
         public MainWindow(IEventAggregator eventAggregator)
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
-
-            _eventAggregator = eventAggregator;
-            _eventAggregator.GetEvent<PopupMessageEvent>().Subscribe(PopupMessage);
+            eventAggregator.GetEvent<PopupMessageEvent>().Subscribe(PopupMessage);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)

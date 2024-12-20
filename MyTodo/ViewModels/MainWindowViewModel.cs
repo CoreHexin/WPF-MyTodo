@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using MyTodo.Core;
+using MyTodo.Core.Events;
 using MyTodo.Core.Models;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 
@@ -35,33 +37,38 @@ namespace MyTodo.ViewModels
         public DelegateCommand MoveNextCommand =>
             _moveNextCommand ?? (_moveNextCommand = new DelegateCommand(ExecuteMoveNextCommand));
 
-        /// <summary>
-        /// 导航前进
-        /// </summary>
-        private void ExecuteMoveNextCommand()
-        {
-            if (_regionNavigationJournal != null && _regionNavigationJournal.CanGoForward)
-            {
-                _regionNavigationJournal.GoForward();
-            }
-        }
-
-        /// <summary>
-        /// 导航后退
-        /// </summary>
-        private void ExecuteMovePrevCommand()
-        {
-            if (_regionNavigationJournal != null && _regionNavigationJournal.CanGoBack)
-            {
-                _regionNavigationJournal.GoBack();
-            }
-        }
-
-        public MainWindowViewModel(IRegionManager regionManager)
+        public MainWindowViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             InitLeftMenu();
             _regionManager = regionManager;
+            eventAggregator.GetEvent<LeftMenuChangedEvent>().Subscribe(ChangeLeftMenu);
         }
+
+        private void ChangeLeftMenu(string target)
+        {
+            if (target == SelectedMenu.Target)
+            {
+                return;
+            }
+
+            switch (target)
+            {
+                case "IndexView":
+                    SelectedMenu = LeftMenuItems[0];
+                    break;
+                case "TodoView":
+                    SelectedMenu = LeftMenuItems[1];
+                    break;
+                case "MemoView":
+                    SelectedMenu = LeftMenuItems[2];
+                    break;
+                default:
+                    SelectedMenu = LeftMenuItems[3];
+                    break;
+            }
+        }
+
+        #region 方法
 
         /// <summary>
         /// 设置默认页面
@@ -86,6 +93,28 @@ namespace MyTodo.ViewModels
                         _regionNavigationJournal = result.Context.NavigationService.Journal;
                     }
                 );
+        }
+
+        /// <summary>
+        /// 导航前进
+        /// </summary>
+        private void ExecuteMoveNextCommand()
+        {
+            if (_regionNavigationJournal != null && _regionNavigationJournal.CanGoForward)
+            {
+                _regionNavigationJournal.GoForward();
+            }
+        }
+
+        /// <summary>
+        /// 导航后退
+        /// </summary>
+        private void ExecuteMovePrevCommand()
+        {
+            if (_regionNavigationJournal != null && _regionNavigationJournal.CanGoBack)
+            {
+                _regionNavigationJournal.GoBack();
+            }
         }
 
         /// <summary>
@@ -121,5 +150,7 @@ namespace MyTodo.ViewModels
                 },
             };
         }
+
+        #endregion
     }
 }

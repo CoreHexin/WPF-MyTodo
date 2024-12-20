@@ -13,10 +13,11 @@ using MyTodo.Core.Services;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Regions;
 
 namespace MyTodo.Modules.Memo.ViewModels
 {
-    public class MemoViewModel : BindableBase
+    public class MemoViewModel : BindableBase, INavigationAware
     {
         #region 字段
 
@@ -192,6 +193,20 @@ namespace MyTodo.Modules.Memo.ViewModels
         private void OpenRightDrawer()
         {
             IsRightDrawerOpen = true;
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            _eventAggregator.GetEvent<LeftMenuChangedEvent>().Publish("MemoView");
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
         }
         #endregion
     }

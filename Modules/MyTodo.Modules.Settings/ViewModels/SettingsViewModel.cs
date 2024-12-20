@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
 using MyTodo.Core;
+using MyTodo.Core.Events;
 using MyTodo.Core.Models;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 
 namespace MyTodo.Modules.Settings.ViewModels
 {
-    public class SettingsViewModel : BindableBase
+    public class SettingsViewModel : BindableBase, INavigationAware
     {
         private readonly IRegionManager _regionManager;
-
+        private readonly IEventAggregator _eventAggregator;
         private LeftMenuItem _selectedMenu;
         public LeftMenuItem SelectedMenu
         {
@@ -24,9 +26,11 @@ namespace MyTodo.Modules.Settings.ViewModels
         public DelegateCommand NavigateCommand =>
             _navigateCommand ?? (_navigateCommand = new DelegateCommand(Navigate));
 
-        public SettingsViewModel(IRegionManager regionManager)
+        public SettingsViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
+            _eventAggregator = eventAggregator;
+
             CreateLeftMenuItems();
         }
 
@@ -58,6 +62,20 @@ namespace MyTodo.Modules.Settings.ViewModels
                     Target = "AboutView",
                 },
             };
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            _eventAggregator.GetEvent<LeftMenuChangedEvent>().Publish("SettingsView");
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
         }
     }
 }

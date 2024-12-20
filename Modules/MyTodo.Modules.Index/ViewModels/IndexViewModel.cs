@@ -19,7 +19,7 @@ using Prism.Services.Dialogs;
 
 namespace MyTodo.Modules.Index.ViewModels
 {
-    public class IndexViewModel : BindableBase
+    public class IndexViewModel : BindableBase, INavigationAware
     {
         #region 字段
         private readonly ApiClient _apiClient;
@@ -455,6 +455,20 @@ namespace MyTodo.Modules.Index.ViewModels
             await todoStatisticTask;
             await todoListTask;
             IsLoading = false;
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            _eventAggregator.GetEvent<LeftMenuChangedEvent>().Publish("IndexView");
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
         }
 
         #endregion
