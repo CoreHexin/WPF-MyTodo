@@ -392,6 +392,11 @@ namespace MyTodo.Modules.Index.ViewModels
 
         private void ShowUpdateMemoDialog(MemoItem memoItem)
         {
+            if (memoItem == null)
+            {
+                return;
+            }
+
             DialogParameters parameters = new DialogParameters() { { "MemoItem", memoItem } };
 
             _dialogService.ShowDialog(
@@ -422,6 +427,11 @@ namespace MyTodo.Modules.Index.ViewModels
         /// <param name="todoItem"></param>
         public void ShowUpdateTodoDialog(TodoItem todoItem)
         {
+            if (todoItem == null)
+            {
+                return;
+            }
+
             DialogParameters dialogParameters = new DialogParameters();
             dialogParameters.Add("TodoItem", todoItem);
 

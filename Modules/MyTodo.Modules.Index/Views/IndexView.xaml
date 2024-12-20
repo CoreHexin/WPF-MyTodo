@@ -106,6 +106,7 @@
                         Grid.Row="1"
                         HorizontalContentAlignment="Stretch"
                         ItemsSource="{Binding TodoItems}"
+                        PreviewMouseWheel="ListBox_PreviewMouseWheel"
                         ScrollViewer.VerticalScrollBarVisibility="Hidden">
 
                         <i:Interaction.Triggers>
@@ -172,6 +173,7 @@
                         Grid.Row="1"
                         HorizontalContentAlignment="Stretch"
                         ItemsSource="{Binding MemoItems}"
+                        PreviewMouseWheel="ListBox_PreviewMouseWheel"
                         ScrollViewer.VerticalScrollBarVisibility="Hidden">
 
                         <i:Interaction.Triggers>
