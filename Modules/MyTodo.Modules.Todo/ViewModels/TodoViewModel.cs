@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows;
 using MyTodo.Core.Api;
 using MyTodo.Core.DTOs;
 using MyTodo.Core.Events;
 using MyTodo.Core.Helpers;
 using MyTodo.Core.Models;
+using MyTodo.Core.Services;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -18,8 +19,11 @@ namespace MyTodo.Modules.Todo.ViewModels
 {
     public class TodoViewModel : BindableBase, INavigationAware
     {
+        #region 字段
         private readonly IEventAggregator _eventAggregator;
         private readonly ApiClient _apiClient;
+        private readonly IMessageBoxService _messageBoxService;
+        #endregion
 
         #region 属性
         public List<TodoStatus> TodoStatuses { get; set; }
@@ -86,11 +90,6 @@ namespace MyTodo.Modules.Todo.ViewModels
             _openRightDrawerCommand
             ?? (_openRightDrawerCommand = new DelegateCommand(ExecuteOpenRightDrawerCommand));
 
-        private void ExecuteOpenRightDrawerCommand()
-        {
-            IsRightDrawerOpen = true;
-        }
-
         private DelegateCommand _saveCommand;
 
         public DelegateCommand SaveCommand =>
@@ -105,71 +104,22 @@ namespace MyTodo.Modules.Todo.ViewModels
         public DelegateCommand SearchCommand =>
             _searchCommand ?? (_searchCommand = new DelegateCommand(ExecuteSearchCommand));
 
-        private async void ExecuteSearchCommand()
-        {
-            await SearchAsync();
-        }
-
-        /// <summary>
-        /// 通过API保存待办事项数据
-        /// </summary>
-        private async void ExecuteSaveCommand()
-        {
-            IsLoading = true;
-            var response = await _apiClient.CreateTodoAsync(TodoForCreateDTO);
-
-            if (!response.IsSuccess)
-            {
-                _eventAggregator
-                    .GetEvent<PopupMessageEvent>()
-                    .Publish("创建待办事项失败, 请稍后重试");
-                return;
-            }
-
-            IsRightDrawerOpen = false;
-            _eventAggregator.GetEvent<PopupMessageEvent>().Publish("创建待办事项成功");
-            await SearchAsync();
-            IsLoading = false;
-        }
-
-        private bool CanExecuteSaveCommand()
-        {
-            return Validator.TryValidateObject(
-                TodoForCreateDTO,
-                new ValidationContext(TodoForCreateDTO),
-                null
-            );
-        }
-
         private DelegateCommand<TodoItem> _deleteCommand;
         public DelegateCommand<TodoItem> DeleteCommand =>
-            _deleteCommand
-            ?? (_deleteCommand = new DelegateCommand<TodoItem>(ExecuteDeleteCommand));
-
-        private async void ExecuteDeleteCommand(TodoItem todoItem)
-        {
-            IsLoading = true;
-            ApiResponse response = await _apiClient.DeleteTodoAsync(todoItem.Id);
-            IsLoading = false;
-
-            if (!response.IsSuccess)
-            {
-                _eventAggregator
-                    .GetEvent<PopupMessageEvent>()
-                    .Publish("删除待办事项失败, 请稍后重试");
-                return;
-            }
-
-            _eventAggregator.GetEvent<PopupMessageEvent>().Publish("删除待办事项成功");
-            TodoItems.Remove(todoItem);
-        }
+            _deleteCommand ?? (_deleteCommand = new DelegateCommand<TodoItem>(Delete));
 
         #endregion
 
-        public TodoViewModel(IEventAggregator eventAggregator, ApiClient apiClient)
+        #region 构造函数
+        public TodoViewModel(
+            IEventAggregator eventAggregator,
+            ApiClient apiClient,
+            IMessageBoxService messageBoxService
+        )
         {
             _eventAggregator = eventAggregator;
             _apiClient = apiClient;
+            _messageBoxService = messageBoxService;
 
             TodoStatuses = new List<TodoStatus>()
             {
@@ -178,7 +128,9 @@ namespace MyTodo.Modules.Todo.ViewModels
                 new TodoStatus() { Name = "已完成", Value = 1 },
             };
         }
+        #endregion
 
+        #region 方法
         /// <summary>
         /// 查询待办事项
         /// </summary>
@@ -209,6 +161,66 @@ namespace MyTodo.Modules.Todo.ViewModels
             TodoItems = new ObservableCollection<TodoItem>(todoItems);
         }
 
+        private async void Delete(TodoItem todoItem)
+        {
+            MessageBoxResult result = _messageBoxService.Show("确认删除?", "温馨提示");
+            if (result != MessageBoxResult.OK)
+            {
+                return;
+            }
+
+            IsLoading = true;
+            ApiResponse response = await _apiClient.DeleteTodoAsync(todoItem.Id);
+            IsLoading = false;
+
+            if (!response.IsSuccess)
+            {
+                _eventAggregator
+                    .GetEvent<PopupMessageEvent>()
+                    .Publish("删除待办事项失败, 请稍后重试");
+                return;
+            }
+
+            _eventAggregator.GetEvent<PopupMessageEvent>().Publish("删除待办事项成功");
+            TodoItems.Remove(todoItem);
+        }
+
+        /// <summary>
+        /// 通过API保存待办事项数据
+        /// </summary>
+        private async void ExecuteSaveCommand()
+        {
+            IsLoading = true;
+            var response = await _apiClient.CreateTodoAsync(TodoForCreateDTO);
+
+            if (!response.IsSuccess)
+            {
+                _eventAggregator
+                    .GetEvent<PopupMessageEvent>()
+                    .Publish("创建待办事项失败, 请稍后重试");
+                return;
+            }
+
+            IsRightDrawerOpen = false;
+            _eventAggregator.GetEvent<PopupMessageEvent>().Publish("创建待办事项成功");
+            await SearchAsync();
+            IsLoading = false;
+        }
+
+        private async void ExecuteSearchCommand()
+        {
+            await SearchAsync();
+        }
+
+        private bool CanExecuteSaveCommand()
+        {
+            return Validator.TryValidateObject(
+                TodoForCreateDTO,
+                new ValidationContext(TodoForCreateDTO),
+                null
+            );
+        }
+
         public void OnNavigatedTo(NavigationContext navigationContext)
         {
             string title = navigationContext.Parameters.GetValue<string>("Title");
@@ -229,5 +241,11 @@ namespace MyTodo.Modules.Todo.ViewModels
         }
 
         public void OnNavigatedFrom(NavigationContext navigationContext) { }
+
+        private void ExecuteOpenRightDrawerCommand()
+        {
+            IsRightDrawerOpen = true;
+        }
+        #endregion
     }
 }

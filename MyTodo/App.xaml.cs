@@ -1,5 +1,6 @@
 ﻿using MyTodo.Core.Api;
 using MyTodo.Core.Models;
+using MyTodo.Core.Services;
 using MyTodo.Modules.Index;
 using MyTodo.Modules.Login;
 using MyTodo.Modules.Login.Views;
@@ -28,6 +29,7 @@ namespace MyTodo
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<ApiClient>();
+            containerRegistry.RegisterSingleton<IMessageBoxService, MessageBoxService>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

@@ -3,11 +3,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows;
 using MyTodo.Core.Api;
 using MyTodo.Core.DTOs;
 using MyTodo.Core.Events;
 using MyTodo.Core.Helpers;
 using MyTodo.Core.Models;
+using MyTodo.Core.Services;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
@@ -19,6 +21,7 @@ namespace MyTodo.Modules.Memo.ViewModels
         #region 字段
 
         private readonly IEventAggregator _eventAggregator;
+        private readonly IMessageBoxService _messageBoxService;
         private readonly ApiClient _apiClient;
 
         #endregion
@@ -98,16 +101,27 @@ namespace MyTodo.Modules.Memo.ViewModels
         #endregion
 
         #region 构造函数
-        public MemoViewModel(ApiClient apiClient, IEventAggregator eventAggregator)
+        public MemoViewModel(
+            ApiClient apiClient,
+            IEventAggregator eventAggregator,
+            IMessageBoxService messageBoxService
+        )
         {
             _apiClient = apiClient;
             _eventAggregator = eventAggregator;
+            _messageBoxService = messageBoxService;
         }
         #endregion
 
         #region 方法
         private async void Delete(MemoItem item)
         {
+            MessageBoxResult result = _messageBoxService.Show("确认删除?", "温馨提示");
+            if (result != MessageBoxResult.OK)
+            {
+                return;
+            }
+
             IsLoading = true;
             var response = await _apiClient.DeleteMemoAsync(item.Id);
             IsLoading = false;
